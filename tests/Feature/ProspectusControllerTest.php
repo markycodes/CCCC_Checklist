@@ -42,6 +42,7 @@ class ProspectusControllerTest extends TestCase
             ->assertSee('id="prospectus-modal"', false)
             ->assertDontSee('prospectus-modal-download', false)
             ->assertDontSee('print-prospectus-modal', false)
+            ->assertDontSee('id="prospectus-modal-title"', false)
             ->assertSee('id="close-prospectus-modal"', false)
             ->assertSee(route('students.prospectus.stream', $student), false);
 

@@ -137,8 +137,7 @@ h1, h2, h3, p { margin-top: 0; }
 .curriculum-actions .search-box { flex: 1; width: 226px; }
 .prospectus-modal { width: min(1100px, 96vw); max-width: none; height: min(92vh, 1000px); max-height: none; padding: 0; overflow: hidden; border: 1px solid #e8dfd5; border-radius: 10px; background: #fff; box-shadow: 0 24px 70px rgba(31,41,55,.24); }
 .prospectus-modal::backdrop { background: rgba(25,31,27,.64); backdrop-filter: blur(3px); }
-.prospectus-modal-header { min-height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 8px 16px 8px 22px; border-bottom: 1px solid #e8e6de; background: #fffefa; }
-.prospectus-modal-header h2 { margin: 0; color: #303a32; font-family: var(--display); font-size: 16px; font-weight: 650; }
+.prospectus-modal-header { min-height: 60px; display: flex; align-items: center; justify-content: flex-end; gap: 16px; padding: 8px 16px 8px 22px; border-bottom: 1px solid #e8e6de; background: #f4f2eb; }
 .prospectus-modal-close { min-height: 38px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid #e6e5dc; border-radius: 5px; background: #fff; color: #5f685f; font: inherit; font-size: 12px; font-weight: 650; cursor: pointer; }
 .prospectus-modal-close { width: 38px; font-size: 23px; line-height: 1; }
 .prospectus-modal-close:hover { border-color: #cf7d5a; background: #fff4ed; color: #873916; }

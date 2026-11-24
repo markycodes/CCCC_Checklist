@@ -202,9 +202,8 @@
             </div>
 
             @if (auth()->user()->isRegistrar())
-                <dialog class="prospectus-modal" id="prospectus-modal" aria-labelledby="prospectus-modal-title">
+                <dialog class="prospectus-modal" id="prospectus-modal" aria-label="BPA Prospectus preview">
                     <header class="prospectus-modal-header">
-                        <h2 id="prospectus-modal-title">BPA Prospectus</h2>
                         <button class="prospectus-modal-close" type="button" id="close-prospectus-modal"
                             aria-label="Close prospectus preview">×</button>
                     </header>
