@@ -180,18 +180,53 @@
                     <p class="section-subtitle">Review by year and semester. Changes are saved to this student record.
                     </p>
                 </div>
-                <label class="search-box">
-                    <span class="search-icon" aria-hidden="true">
-                        <svg viewBox="0 0 20 20" fill="none">
-                            <circle cx="8.8" cy="8.8" r="5.6" stroke="currentColor" stroke-width="1.6" />
-                            <path d="m13 13 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
-                        </svg>
-                    </span>
-                    <input id="course-search" type="search" placeholder="Find a course..." autocomplete="off"
-                        aria-label="Find a course in this semester">
-                    <kbd>/</kbd>
-                </label>
+                <div class="curriculum-actions">
+                    <button class="primary-link" type="button" id="open-prospectus-modal" aria-haspopup="dialog"
+                        aria-controls="prospectus-modal">
+                        Preview Prospectus <span aria-hidden="true">↗</span>
+                    </button>
+                    <label class="search-box">
+                        <span class="search-icon" aria-hidden="true">
+                            <svg viewBox="0 0 20 20" fill="none">
+                                <circle cx="8.8" cy="8.8" r="5.6" stroke="currentColor" stroke-width="1.6" />
+                                <path d="m13 13 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                            </svg>
+                        </span>
+                        <input id="course-search" type="search" placeholder="Find a course..." autocomplete="off"
+                            aria-label="Find a course in this semester">
+                        <kbd>/</kbd>
+                    </label>
+                </div>
             </div>
+
+            <dialog class="prospectus-modal" id="prospectus-modal" aria-labelledby="prospectus-modal-title">
+                <header class="prospectus-modal-header">
+                    <h2 id="prospectus-modal-title">BPA Prospectus</h2>
+                    <div class="prospectus-modal-actions">
+                        <a class="prospectus-modal-download" href="{{ route('prospectus.download') }}">
+                            <svg viewBox="0 0 20 20" aria-hidden="true">
+                                <path d="M10 2.5v9m0 0 3.5-3.5M10 11.5 6.5 8M3.5 13v3.5h13V13"
+                                    fill="none" stroke="currentColor" stroke-linecap="round"
+                                    stroke-linejoin="round" stroke-width="1.6" />
+                            </svg>
+                            Download PDF
+                        </a>
+                        <button class="prospectus-modal-print" type="button" id="print-prospectus-modal">
+                            <svg viewBox="0 0 20 20" aria-hidden="true">
+                                <path d="M5.5 7V2.8h9V7m-9 7H3.2V8.5h13.6V14h-2.3m-9 0v3.2h9V14H5.5Z"
+                                    fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="1.5" />
+                                <path d="M13.5 11h1" stroke="currentColor" stroke-linecap="round"
+                                    stroke-width="1.5" />
+                            </svg>
+                            Print
+                        </button>
+                        <button class="prospectus-modal-close" type="button" id="close-prospectus-modal"
+                            aria-label="Close prospectus preview">×</button>
+                    </div>
+                </header>
+                <iframe class="prospectus-modal-frame" title="BPA Prospectus preview"
+                    src="{{ route('prospectus.show', ['modal' => 1]) }}"></iframe>
+            </dialog>
 
             <div class="curriculum-layout">
                 <aside class="year-rail" aria-label="Choose an academic year">
@@ -313,6 +348,23 @@
             button.setAttribute('aria-label', 'Open navigation menu');
             menu.classList.remove('is-open');
             button.focus();
+        });
+
+        const prospectusModal = document.querySelector('#prospectus-modal');
+        const prospectusFrame = document.querySelector('.prospectus-modal-frame');
+        document.querySelector('#open-prospectus-modal').addEventListener('click', () => {
+            prospectusModal.showModal();
+        });
+        document.querySelector('#close-prospectus-modal').addEventListener('click', () => {
+            prospectusModal.close();
+        });
+        document.querySelector('#print-prospectus-modal').addEventListener('click', () => {
+            prospectusFrame.contentWindow.print();
+        });
+        prospectusModal.addEventListener('click', (event) => {
+            if (event.target === prospectusModal) {
+                prospectusModal.close();
+            }
         });
     </script>
 </body>

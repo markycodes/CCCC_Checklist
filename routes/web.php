@@ -40,3 +40,5 @@ Route::middleware(['auth', 'program-head'])->group(function () {
 
     Route::redirect('/checklist', '/students')->name('checklist');
 });
+
+require __DIR__.'/prospectus-routes.php';

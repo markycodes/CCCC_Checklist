@@ -132,6 +132,21 @@ h1, h2, h3, p { margin-top: 0; }
 .curriculum-heading h2 { margin-top: 8px; font-size: 23px; }
 .section-subtitle { margin: 6px 0 0; color: #80877d; font-size: 11px; }
 .search-box { display: flex; align-items: center; gap: 9px; width: 226px; height: 38px; padding: 0 10px; border: 1px solid #e6e5dc; border-radius: 5px; background: #fffefa; color: #999e94; }
+.curriculum-actions { display: flex; align-items: center; gap: 10px; }
+.curriculum-actions .primary-link { flex: 0 0 auto; white-space: nowrap; cursor: pointer; }
+.curriculum-actions .search-box { flex: 1; width: 226px; }
+.prospectus-modal { width: min(1100px, 96vw); max-width: none; height: min(92vh, 1000px); max-height: none; padding: 0; overflow: hidden; border: 1px solid #e8dfd5; border-radius: 10px; background: #fff; box-shadow: 0 24px 70px rgba(31,41,55,.24); }
+.prospectus-modal::backdrop { background: rgba(25,31,27,.64); backdrop-filter: blur(3px); }
+.prospectus-modal-header { min-height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 8px 16px 8px 22px; border-bottom: 1px solid #e8e6de; background: #fffefa; }
+.prospectus-modal-header h2 { margin: 0; color: #303a32; font-family: var(--display); font-size: 16px; font-weight: 650; }
+.prospectus-modal-actions { display: flex; align-items: center; gap: 8px; }
+.prospectus-modal-download, .prospectus-modal-print, .prospectus-modal-close { min-height: 38px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 1px solid #e6e5dc; border-radius: 5px; background: #fff; color: #5f685f; font: inherit; font-size: 12px; font-weight: 650; text-decoration: none; cursor: pointer; }
+.prospectus-modal-download, .prospectus-modal-print { padding: 0 12px; }
+.prospectus-modal-download svg, .prospectus-modal-print svg { width: 16px; height: 16px; }
+.prospectus-modal-print { padding: 0 14px; }
+.prospectus-modal-close { width: 38px; font-size: 23px; line-height: 1; }
+.prospectus-modal-download:hover, .prospectus-modal-print:hover, .prospectus-modal-close:hover { border-color: #cf7d5a; background: #fff4ed; color: #873916; }
+.prospectus-modal-frame { width: 100%; height: calc(100% - 60px); display: block; border: 0; background: #e9e9e9; }
 .search-icon { display: grid; place-items: center; width: 16px; height: 16px; }
 .search-icon svg { width: 16px; height: 16px; }
 .search-box input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: 11px; }
@@ -262,6 +277,9 @@ h1, h2, h3, p { margin-top: 0; }
     .stats-grid { grid-template-columns: minmax(0,1.25fr) minmax(0,1fr) minmax(0,1fr); }
     .stat-next { grid-column: 1 / -1; min-height: 100px; }
     .curriculum-layout { grid-template-columns: 157px minmax(0,1fr); }
+    .curriculum-heading { align-items: flex-start; flex-direction: column; }
+    .curriculum-actions { width: 100%; }
+    .curriculum-actions .search-box { width: auto; min-width: 0; }
     .student-switcher { grid-column: 1 / -1; grid-row: 1; position: static; }
     .student-switcher-list { max-height: 180px; }
     .year-rail { grid-column: 1; grid-row: 2; }
@@ -366,6 +384,12 @@ h1, h2, h3, p { margin-top: 0; }
     .curriculum-heading { align-items: flex-start; flex-direction: column; gap: 13px; }
     .curriculum-heading h2 { font-size: 20px; }
     .search-box { width: 100%; }
+    .curriculum-actions { gap: 8px; }
+    .curriculum-actions .primary-link { gap: 7px; padding-right: 11px; padding-left: 11px; }
+    .curriculum-actions .search-box { width: auto; min-width: 0; }
+    .prospectus-modal { width: 100vw; height: 100dvh; border: 0; border-radius: 0; }
+    .prospectus-modal-header { padding-right: 12px; padding-left: 15px; }
+    .prospectus-modal-frame { height: calc(100% - 60px); }
     .curriculum-layout { grid-template-columns: 1fr; gap: 13px; margin-top: 16px; }
     .student-switcher { grid-column: 1; grid-row: 1; }
     .year-rail { grid-column: 1; grid-row: 2; }
