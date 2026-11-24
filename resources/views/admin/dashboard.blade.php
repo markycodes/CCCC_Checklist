@@ -13,7 +13,13 @@
             <h1>Registrar overview</h1>
             <p>Enrollment, student progress, and Program Head activity across CCCC.</p>
         </div>
-        <button class="portal-primary-button" type="button" data-open-program-head-modal><span class="button-icon" aria-hidden="true">＋</span> Create Program Head</button>
+        <div class="admin-heading-actions">
+            <span class="admin-live-status"><i aria-hidden="true"></i> Live overview</span>
+            <button class="portal-primary-button" type="button" data-open-program-head-modal>
+                <span class="button-icon" aria-hidden="true">＋</span>
+                Create Program Head
+            </button>
+        </div>
     </section>
 
     @if (session('status'))
@@ -21,10 +27,34 @@
     @endif
 
     <section class="admin-metrics" aria-label="School metrics">
-        <article><span>Total students</span><strong>{{ $totalStudents }}</strong></article>
-        <article><span>Program Heads</span><strong>{{ $totalProgramHeads }}</strong></article>
-        <article><span>Course grades entered</span><strong>{{ $totalCompletedCourses }}</strong></article>
-        <article><span>Completed checklists</span><strong>{{ $progress['completed'] }}</strong></article>
+        <article>
+            <div class="admin-metric-top"><span class="admin-metric-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </span><small>All records</small></div>
+            <strong>{{ $totalStudents }}</strong>
+            <span>Total students</span>
+        </article>
+        <article>
+            <div class="admin-metric-top"><span class="admin-metric-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg>
+            </span><small>Authorized</small></div>
+            <strong>{{ $totalProgramHeads }}</strong>
+            <span>Program Heads</span>
+        </article>
+        <article>
+            <div class="admin-metric-top"><span class="admin-metric-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg>
+            </span><small>Curriculum</small></div>
+            <strong>{{ $totalCompletedCourses }}</strong>
+            <span>Course grades entered</span>
+        </article>
+        <article>
+            <div class="admin-metric-top"><span class="admin-metric-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></svg>
+            </span><small>On track</small></div>
+            <strong>{{ $progress['completed'] }}</strong>
+            <span>Completed checklists</span>
+        </article>
     </section>
 
     <section class="admin-grid">

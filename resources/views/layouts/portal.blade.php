@@ -11,7 +11,11 @@
     <link rel="icon" href="{{ asset('assets/img/CCCClogo.webp') }}" type="image/x-icon">
 </head>
 <body class="portal-body">
-    <header class="portal-topbar">
+    <header @class(['portal-topbar', 'portal-topbar-landing' => request()->routeIs('home', 'login')])>
+        @if (request()->routeIs('home', 'login'))
+            <span class="portal-topbar-curve portal-topbar-curve-left" aria-hidden="true"></span>
+            <span class="portal-topbar-curve portal-topbar-curve-right" aria-hidden="true"></span>
+        @endif
         <a class="portal-brand" href="{{ route('home') }}" aria-label="Catbalogan City Community College home">
             <img class="college-logo" src="{{ asset('assets/img/CCCClogo.webp') }}" width="45" height="47" alt="">
             <span class="portal-brand-copy">
@@ -116,6 +120,61 @@
             menu.classList.remove('is-open');
             button.focus();
         });
+
+        document.addEventListener('click', (event) => {
+            const button = document.querySelector('.portal-menu-toggle');
+            const menu = document.querySelector('#portal-mobile-menu');
+            if (!button || !menu || button.getAttribute('aria-expanded') !== 'true') return;
+            if (button.contains(event.target) || menu.contains(event.target)) return;
+
+            button.setAttribute('aria-expanded', 'false');
+            button.setAttribute('aria-label', 'Open navigation menu');
+            menu.classList.remove('is-open');
+        });
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 580) {
+                const button = document.querySelector('.portal-menu-toggle');
+                const menu = document.querySelector('#portal-mobile-menu');
+                if (!button || !menu) return;
+                button.setAttribute('aria-expanded', 'false');
+                button.setAttribute('aria-label', 'Open navigation menu');
+                menu.classList.remove('is-open');
+            }
+        });
+
+        const courseScrollShell = document.querySelector('.course-scroll-shell');
+        if (courseScrollShell) {
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+            let courseScrollFrame = 0;
+
+            const updateCourseScroll = () => {
+                courseScrollFrame = 0;
+                if (reduceMotion.matches) return;
+
+                const rect = courseScrollShell.getBoundingClientRect();
+                const range = Math.max(courseScrollShell.offsetHeight - window.innerHeight * 0.25, 1);
+                const progress = Math.min(1, Math.max(0, (window.innerHeight * 0.78 - rect.top) / range));
+                const isMobile = window.innerWidth <= 760;
+                const rotate = 20 * (1 - progress);
+                const scale = isMobile ? 0.7 + (0.2 * progress) : 1.05 - (0.05 * progress);
+                const translate = -100 * progress;
+
+                courseScrollShell.style.setProperty('--course-card-rotate', `${rotate}deg`);
+                courseScrollShell.style.setProperty('--course-card-scale', scale.toFixed(3));
+                courseScrollShell.style.setProperty('--course-header-translate', `${translate}px`);
+            };
+
+            const requestCourseScrollUpdate = () => {
+                if (!courseScrollFrame) {
+                    courseScrollFrame = window.requestAnimationFrame(updateCourseScroll);
+                }
+            };
+
+            window.addEventListener('scroll', requestCourseScrollUpdate, { passive: true });
+            window.addEventListener('resize', requestCourseScrollUpdate);
+            updateCourseScroll();
+        }
     </script>
 </body>
 </html>

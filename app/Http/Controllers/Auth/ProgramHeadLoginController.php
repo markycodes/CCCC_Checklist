@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -31,8 +32,41 @@ class ProgramHeadLoginController extends Controller
     {
         $credentials = $request->validate([
             'email' => ['required', 'email', 'max:255'],
-            'password' => ['required', 'string'],
+            'password' => [
+                'required',
+                'string',
+                'max:4096',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    if (is_string($value) && preg_match('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', $value)) {
+                        $fail('The password contains unsupported control characters.');
+                    }
+                },
+            ],
         ]);
+
+        if (config('cloudflare-turnstile.enabled')) {
+            $request->validate([
+                'cf-turnstile-response' => ['required', 'string'],
+            ], [
+                'cf-turnstile-response.required' => 'Please complete the Cloudflare verification.',
+            ]);
+
+            $verification = Http::asForm()->post(
+                'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+                [
+                    'secret' => config('cloudflare-turnstile.secret_key'),
+                    'response' => $request->input('cf-turnstile-response'),
+                    'remoteip' => $request->ip(),
+                ],
+            );
+
+            if (! $verification->successful() || ! ($verification->json('success') ?? false)) {
+                throw ValidationException::withMessages([
+                    'cf-turnstile-response' => 'Cloudflare verification failed. Please try again.',
+                ]);
+            }
+        }
+
         $credentials['email'] = Str::lower($credentials['email']);
 
         if (! Auth::attempt([

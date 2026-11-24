@@ -5,35 +5,41 @@
 
 @section('content')
     <main>
-        <section class="portal-hero landing-hero">
+        <section class="portal-hero landing-hero" aria-labelledby="landing-title">
             <div class="portal-hero-copy landing-hero-copy">
-                <p class="portal-kicker"><span></span> STUDENT COURSE CHECKLIST</p>
-                <h1>Curriculum and<br>course checklist</h1>
-                <p class="portal-hero-intro">An academic course guide for Catbalogan City Community College. Review a
-                    curriculum by semester and keep track of completed subjects.</p>
+                <p class="portal-kicker"><span></span> CCCC STUDENT CHECKLIST</p>
+                <h1 id="landing-title">Every course.<br><em>Every step forward.</em></h1>
+                <p class="portal-hero-intro">A clear academic roadmap for Catbalogan City Community College students,
+                    from enrollment through graduation.</p>
                 <div class="portal-hero-actions">
                     @auth
-                        <a class="portal-primary-button" href="{{ route('students.index') }}"><span class="button-icon" aria-hidden="true">♙</span> Open student records</a>
+                        <a class="portal-primary-button" href="{{ route('students.index') }}">
+                            Open student records
+                            <span class="button-icon" aria-hidden="true">→</span>
+                        </a>
                         <span class="portal-action-note">Signed in as {{ auth()->user()->name }}</span>
                     @else
-                        <a class="portal-primary-button" href="{{ route('login') }}"><span class="button-icon" aria-hidden="true">↗</span> Program Head sign in</a>
+                        <a class="portal-primary-button" href="{{ route('login') }}">
+                            Program Head sign in
+                            <span class="button-icon" aria-hidden="true">→</span>
+                        </a>
                         <span class="portal-action-note">Access for authorized Program Heads</span>
                     @endauth
+                </div>
+                <div class="landing-hero-proof" aria-label="Academic planning information">
+                    <span><strong>4</strong> academic years</span>
+                    <span><strong>8</strong> semesters</span>
+                    <span><strong>146</strong> total units</span>
                 </div>
             </div>
 
             <aside class="curriculum-card landing-hero-overview" aria-label="Curriculum overview">
                 <div class="curriculum-card-heading">
                     <div>
-                        <span class="curriculum-card-label">PROGRAM OVERVIEW</span>
+                        <span class="curriculum-card-label">BACHELOR OF PUBLIC ADMINISTRATION</span>
                         <h2>At a glance</h2>
                     </div>
-                  <img class="college-logo" src="{{ asset('assets/img/cccc.png') }}" width="45" height="47" alt="">
-                </div>
-                <div class="curriculum-facts">
-                    <div><strong>4</strong><span>academic years</span></div>
-                    <div><strong>8</strong><span>semesters</span></div>
-                    <div><strong>146</strong><span>total units</span></div>
+                    <img class="college-logo" src="{{ asset('assets/img/cccc.png') }}" width="45" height="47" alt="CCCC seal">
                 </div>
                 <div class="year-list">
                     <div class="year-list-heading"><span>CURRICULUM BY YEAR</span><span>UNITS</span></div>
@@ -42,56 +48,70 @@
                     <div class="year-list-row"><span><i>03</i> Third year</span><strong>36</strong></div>
                     <div class="year-list-row"><span><i>04</i> Fourth year</span><strong>24</strong></div>
                 </div>
-                <p class="curriculum-card-note"><span aria-hidden="true">i</span> Use your official evaluation for
-                    enrollment and advising decisions.</p>
+                <div class="landing-overview-progress" aria-label="Curriculum distribution">
+                    <span class="progress-year-one"></span>
+                    <span class="progress-year-two"></span>
+                    <span class="progress-year-three"></span>
+                    <span class="progress-year-four"></span>
+                </div>
+                <p class="curriculum-card-note">
+                    <span aria-hidden="true">i</span>
+                    Use your official evaluation for enrollment and advising decisions.
+                </p>
             </aside>
         </section>
 
-        <section id="curriculum" class="portal-details">
-            <div class="portal-details-heading">
-                <div>
-                    <p class="portal-kicker"><span></span> REGISTRAR WORKFLOW</p>
-                    <h2>Student records from enrollment to completion.</h2>
+        <section id="curriculum" class="course-scroll-shell">
+            <div class="course-scroll-inner">
+                <div class="course-scroll-header">
+                    <div>
+                        <p class="portal-kicker"><span></span> COURSE OVERVIEW</p>
+                        <h2>Student records from enrollment to completion.</h2>
+                    </div>
+                    <p>Manage academic records, monitor enrollment, and keep each student checklist ready for Program Head
+                        evaluation.</p>
                 </div>
-                <p>Manage academic records, monitor enrollment, and keep each student checklist ready for Program Head
-                    evaluation.</p>
+                <div class="course-scroll-card">
+                    <div class="course-scroll-card-inner">
+                        <div class="program-stages">
+                            <article class="program-stage">
+                                <span class="stage-number">01</span>
+                                <div>
+                                    <h3>Enrollment</h3>
+                                    <p>Register new students and maintain entry-year information.</p>
+                                </div>
+                                <span class="stage-units">Student records</span>
+                            </article>
+                            <article class="program-stage">
+                                <span class="stage-number">02</span>
+                                <div>
+                                    <h3>Assignment</h3>
+                                    <p>Place each student under the appropriate Program Head.</p>
+                                </div>
+                                <span class="stage-units">Program access</span>
+                            </article>
+                            <article class="program-stage">
+                                <span class="stage-number">03</span>
+                                <div>
+                                    <h3>Grade review</h3>
+                                    <p>Monitor course grades entered by authorized faculty staff.</p>
+                                </div>
+                                <span class="stage-units">Progress status</span>
+                            </article>
+                            <article class="program-stage">
+                                <span class="stage-number">04</span>
+                                <div>
+                                    <h3>Reporting</h3>
+                                    <p>Review enrollment trends and academic completion summaries.</p>
+                                </div>
+                                <span class="stage-units">School overview</span>
+                            </article>
+                        </div>
+                        <p class="portal-disclaimer">Student records and grade changes remain subject to role permissions and official
+                            college records.</p>
+                    </div>
+                </div>
             </div>
-            <div class="program-stages">
-                <article class="program-stage">
-                    <span class="stage-number">01</span>
-                    <div>
-                        <h3>Enrollment</h3>
-                        <p>Register new students and maintain entry-year information.</p>
-                    </div>
-                    <span class="stage-units">Student records</span>
-                </article>
-                <article class="program-stage">
-                    <span class="stage-number">02</span>
-                    <div>
-                        <h3>Assignment</h3>
-                        <p>Place each student under the appropriate Program Head.</p>
-                    </div>
-                    <span class="stage-units">Program access</span>
-                </article>
-                <article class="program-stage">
-                    <span class="stage-number">03</span>
-                    <div>
-                        <h3>Grade review</h3>
-                        <p>Monitor course grades entered by authorized faculty staff.</p>
-                    </div>
-                    <span class="stage-units">Progress status</span>
-                </article>
-                <article class="program-stage">
-                    <span class="stage-number">04</span>
-                    <div>
-                        <h3>Reporting</h3>
-                        <p>Review enrollment trends and academic completion summaries.</p>
-                    </div>
-                    <span class="stage-units">School overview</span>
-                </article>
-            </div>
-            <p class="portal-disclaimer">Student records and grade changes remain subject to role permissions and official
-                college records.</p>
         </section>
     </main>
 @endsection

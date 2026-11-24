@@ -32,6 +32,9 @@
                     value="{{ old('email') }}"
                     autocomplete="username"
                     inputmode="email"
+                    maxlength="255"
+                    autocapitalize="none"
+                    spellcheck="false"
                     required
                     autofocus
                     aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}"
@@ -50,6 +53,9 @@
                     name="password"
                     type="password"
                     autocomplete="current-password"
+                    maxlength="4096"
+                    autocapitalize="none"
+                    spellcheck="false"
                     required
                     aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}"
                     @if ($errors->has('password')) aria-describedby="password-error" @endif
@@ -62,10 +68,24 @@
                     <input type="checkbox" name="remember" value="1">
                     <span>Remember this device</span>
                 </label>
+                @if (config('cloudflare-turnstile.enabled'))
+                    <div
+                        class="cf-turnstile login-turnstile"
+                        data-sitekey="{{ config('cloudflare-turnstile.site_key') }}"
+                        data-theme="light"
+                        data-size="flexible"
+                    ></div>
+                    @error('cf-turnstile-response')
+                        <p class="login-error" role="alert">{{ $message }}</p>
+                    @enderror
+                @endif
                 <button class="portal-primary-button login-submit" type="submit"><span class="button-icon" aria-hidden="true">↗</span> Sign in</button>
             </form>
 
             <p class="login-help">Need access? Contact your system administrator to request a Program Head account.</p>
         </section>
     </main>
+    @if (config('cloudflare-turnstile.enabled'))
+        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    @endif
 @endsection
