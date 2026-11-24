@@ -42,7 +42,9 @@ body { font-family: {!! config('prospectus.font_family') !!}; font-size: 10pt; l
 .t-row td   { font-size: {{ $f['row'] }}pt; vertical-align: top; padding: {{ $sp['row_pad'] }}pt 2pt; }
 .t-total td { font-size: {{ $f['total'] }}pt; font-weight: bold; padding: 1pt 2pt 0 2pt; }
 .t-total .lbl { text-align: right; padding-right: 10pt; }
-.t-eval td  { font-size: {{ $f['eval'] }}pt; padding-top: 3pt; white-space: nowrap; }
+.evaluation-row { width: auto; margin: 0 0 0 auto; border-collapse: collapse; }
+.evaluation-row td { font-size: {{ $f['eval'] }}pt; padding: 3pt 0 0; vertical-align: bottom; white-space: nowrap; }
+.evaluation-row .eval-line { display: block; width: 95pt; height: 9pt; border-bottom-color: #000; }
 
 table.hdr { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .hdr td { vertical-align: top; padding: 0; }
@@ -68,7 +70,6 @@ table.gb { width: 100%; border-collapse: collapse; }
 .sem-block { margin-bottom: {{ $sp['sem_gap'] }}pt; padding-left: 0.15in; padding-right: 0.05in; page-break-inside: avoid; }
 table.ct { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .chk { display: inline-block; width: 14pt; border-bottom: 0.75pt solid #000; height: 8pt; margin-right: 2pt; vertical-align: baseline; }
-.eval-line { width: 95pt; border-bottom-color: #000; }
 
 .sum-title { font-family: 'Arial Narrow', sans-serif; font-size: 11pt; font-weight: bold; text-align: center; border-top: 1.2pt solid #000; margin-top: 16pt; padding-top: 1pt; }
 .pdf-summary-title { margin-top: 72pt; }

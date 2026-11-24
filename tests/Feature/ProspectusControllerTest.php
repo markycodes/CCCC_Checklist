@@ -33,13 +33,15 @@ class ProspectusControllerTest extends TestCase
         $this->get(route('prospectus.show'))
             ->assertOk()
             ->assertSee('GRADING SYSTEM')
-            ->assertSee('FIRST YEAR');
+            ->assertSee('FIRST YEAR')
+            ->assertSee('class="evaluation-row"', false);
 
         $this->get(route('prospectus.show', ['modal' => 1]))
             ->assertOk()
             ->assertSee('class="embedded-preview"', false)
             ->assertDontSee('Modal Preview')
-            ->assertSee('GRADING SYSTEM');
+            ->assertSee('GRADING SYSTEM')
+            ->assertSee('class="evaluation-row"', false);
     }
 
     public function test_registrars_and_administrators_can_preview_prospectus(): void

@@ -46,8 +46,10 @@
 @if (!empty($sem['show_grand_total']))
 <tr class="t-total"><td colspan="2" class="lbl">Grand Total</td><td colspan="2">{{ $grandTotal }} units</td><td colspan="2"></td></tr>
 @endif
-<tr class="t-eval"><td colspan="4"></td><td colspan="2">Evaluated by: <span class="line eval-line"></span></td></tr>
-</tbody></table></div>
+</tbody></table>
+<table class="evaluation-row"><tr>
+<td>Evaluated by:</td><td><span class="line eval-line"></span></td>
+</tr></table></div>
 @endforeach
 @endforeach
 
