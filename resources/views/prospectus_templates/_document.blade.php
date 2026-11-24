@@ -2,10 +2,14 @@
 <div class="sheet">
 <table class="hdr"><tr>
 <td class="hdr-l">
- <div class="f-name"><strong>Name:</strong> <span class="line" style="width:88pt"></span></div>
- <div class="f-line">Student ID No.: <span class="line" style="width:60pt"></span></div>
- <div class="f-line">Year Entry: 20<span class="line" style="width:18pt"></span> - 20<span class="line" style="width:18pt"></span></div>
+ <div class="f-name"><strong>Name:</strong> @if ($student) <span class="student-field-value student-name">{{ $student->name }}</span> @else <span class="line" style="width:88pt"></span> @endif</div>
+ <div class="f-line">Student ID No.: @if ($student) <span class="student-field-value">{{ $student->student_id }}</span> @else <span class="line" style="width:60pt"></span> @endif</div>
+ <div class="f-line">Year Entry: @if ($student) <span class="student-field-value">{{ $student->entry_year }} - {{ $student->expected_graduation_year ?? $student->entry_year + 4 }}</span> @else 20<span class="line" style="width:18pt"></span> - 20<span class="line" style="width:18pt"></span> @endif</div>
+ @if ($student?->previous_school)
+ <div class="f-note"><span>Previous school: {{ $student->previous_school }}</span><br><span>Last year attended: {{ $student->last_year_attended ?: '—' }}</span></div>
+ @else
  <div class="f-note"><span>if transferee, please write the previous</span><br><span>school and last year attended</span></div>
+ @endif
  <div class="f-line"><span class="line" style="width:100%"></span></div>
 </td>
 <td class="hdr-c">
@@ -40,7 +44,7 @@
 <table class="ct">
 <thead><tr class="t-colhead"><th style="width:{{ $cfg['cols'][0] }}">Course Code</th><th style="width:{{ $cfg['cols'][1] }}">Course Title</th><th style="width:{{ $cfg['cols'][2] }}">Lecture<br><span class="reg">(Hours)</span></th><th style="width:{{ $cfg['cols'][3] }}">Lab<br><span class="reg">(Hours)</span></th><th style="width:{{ $cfg['cols'][4] }}">Credit<br><span class="reg">(Units)</span></th><th style="width:{{ $cfg['cols'][5] }}">Pre-requisite<br><span class="reg">Co-requisite</span></th></tr></thead><tbody>
 @foreach ($sem['courses'] as $c)
-<tr class="t-row"><td><span class="chk"></span>{{ $c[0] }}</td><td>{{ $c[1] }}</td><td>{{ $c[2] }}</td><td>{{ $c[3] }}</td><td>{{ $c[4] }}</td><td>{{ $c[5] }}</td></tr>
+<tr class="t-row"><td><span @class(['chk', 'chk-grade' => !empty($c[6])])>{{ $c[6] ?? '' }}</span>{{ $c[0] }}</td><td>{{ $c[1] }}</td><td>{{ $c[2] }}</td><td>{{ $c[3] }}</td><td>{{ $c[4] }}</td><td>{{ $c[5] }}</td></tr>
 @endforeach
 <tr class="t-total"><td colspan="2" class="lbl">Total Units</td><td>{{ $lec }}</td><td>{{ $lab }}</td><td>{{ $cr }}</td><td></td></tr>
 @if (!empty($sem['show_grand_total']))

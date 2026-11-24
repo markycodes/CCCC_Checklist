@@ -54,6 +54,8 @@ table.hdr { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .f-name { font-size: 9pt; font-weight: normal; margin-bottom: 7pt; }
 .f-line { font-size: 9pt; font-weight: normal; margin-bottom: 7pt; }
 .f-note { font-size: 8pt; font-weight: normal; margin-bottom: 7pt; line-height: 1.3; }
+.student-field-value { display: inline-block; border-bottom: 0.75pt solid #1f3a7a; line-height: 1.05; }
+.student-name { font-weight: bold; }
 .f-note span { white-space: nowrap; }
 .line { display: inline-block; border-bottom: 0.75pt solid #1f3a7a; height: 9pt; vertical-align: baseline; }
 .logos-t { border-collapse: collapse; margin: 0 auto 2pt auto; }
@@ -70,6 +72,8 @@ table.gb { width: 100%; border-collapse: collapse; }
 .sem-block { margin-bottom: {{ $sp['sem_gap'] }}pt; padding-left: 0.15in; padding-right: 0.05in; page-break-inside: avoid; }
 table.ct { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .chk { display: inline-block; width: 14pt; border-bottom: 0.75pt solid #000; height: 8pt; margin-right: 2pt; vertical-align: baseline; }
+.chk-grade { width: 21pt; font-size: 9pt; font-weight: bold; line-height: 1; text-align: center; }
+.t-row td:first-child { white-space: nowrap; }
 
 .sum-title { font-family: 'Arial Narrow', sans-serif; font-size: 11pt; font-weight: bold; text-align: center; border-top: 1.2pt solid #000; margin-top: 16pt; padding-top: 1pt; }
 .pdf-summary-title { margin-top: 72pt; }

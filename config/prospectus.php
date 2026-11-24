@@ -15,7 +15,7 @@ return [
     'font_family' => 'Helvetica, Arial, sans-serif',
 
     // Table column widths: code, title, lecture, lab, credit, pre-requisite
-    'cols' => ['16%', '42%', '8%', '8%', '8%', '18%'],
+    'cols' => ['18%', '40%', '8%', '8%', '8%', '18%'],
 
     // Spacing in pt. If page 1 overflows, lower row_pad / sem_gap a little.
     'spacing' => ['line_height' => 1.05, 'row_pad' => 0.6, 'sem_gap' => 5],
