@@ -14,7 +14,9 @@ class ProspectusController extends Controller
     /** Browser preview (printable). */
     public function show(Request $request, ?Student $student = null)
     {
-        return view('prospectus_templates.preview', $this->data(false, $student) + [
+        $data = $this->data(false, $student);
+
+        return view($data['template']['view'].'.preview', $data + [
             'autoprint' => $request->boolean('print'),
         ]);
     }
@@ -22,25 +24,29 @@ class ProspectusController extends Controller
     /** Download as PDF. */
     public function download(?Student $student = null)
     {
-        return $this->pdf($student)->download(config('prospectus.filename'));
+        $data = $this->data(true, $student);
+
+        return $this->pdf($student, $data)->download($data['cfg']['filename']);
     }
 
     /** Open the PDF in the browser tab. */
     public function stream(?Student $student = null)
     {
-        return $this->pdf($student)->stream(config('prospectus.filename'));
+        $data = $this->data(true, $student);
+
+        return $this->pdf($student, $data)->stream($data['cfg']['filename']);
     }
 
-    private function pdf(?Student $student = null)
+    private function pdf(?Student $student = null, ?array $data = null)
     {
-        return Pdf::loadView('prospectus_templates.pdf', $this->data(true, $student))
-            ->setPaper(config('prospectus.paper'), 'portrait');
+        $data ??= $this->data(true, $student);
+
+        return Pdf::loadView($data['template']['view'].'.pdf', $data)
+            ->setPaper($data['cfg']['paper'], 'portrait');
     }
 
     private function data(bool $forPdf, ?Student $student = null): array
     {
-        $cfg = config('prospectus');
-
         $program = User::PROGRAM_BPA;
         if ($student?->programHead) {
             $program = Str::upper(trim((string) $student->programHead->program));
@@ -48,9 +54,13 @@ class ProspectusController extends Controller
             $program = Str::upper(trim((string) auth()->user()->program));
         }
 
-        if (! in_array($program, config('prospectus.templates', [User::PROGRAM_BPA]), true)) {
+        $templates = config('prospectus.templates', []);
+        if (! array_key_exists($program, $templates)) {
             $program = User::PROGRAM_BPA;
         }
+
+        $template = $templates[$program];
+        $cfg = require $template['config'];
 
         if ($student) {
             $this->authorize('view', $student);
@@ -101,6 +111,7 @@ class ProspectusController extends Controller
             'grandTotal' => $grandTotal,
             'forPdf' => $forPdf,
             'student' => $student,
+            'template' => $template,
         ];
     }
 }

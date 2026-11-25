@@ -3,7 +3,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BPA Prospectus – Student’s Copy</title>
 <style>
-@include('prospectus_templates._styles')
+@include('prospectus_templates.BPA._styles')
 
 /* ---- screen-only preview chrome ---- */
 body { background: #e9e9e9; }
@@ -33,7 +33,7 @@ body { background: #e9e9e9; }
 @endunless
 
 <div class="scroll">
-@include('prospectus_templates._document')
+@include('prospectus_templates.BPA._document')
 </div>
 
 @unless (request()->boolean('modal'))
@@ -45,7 +45,7 @@ body { background: #e9e9e9; }
     <button type="button" class="close-button" id="close-prospectus-preview">Close</button>
   </div>
   <div class="preview-modal-scroll">
-    @include('prospectus_templates._document')
+    @include('prospectus_templates.BPA._document')
   </div>
 </dialog>
 

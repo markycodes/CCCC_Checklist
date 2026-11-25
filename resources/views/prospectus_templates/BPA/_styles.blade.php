@@ -1,4 +1,4 @@
-@php $f = config('prospectus.font'); $sp = config('prospectus.spacing'); @endphp
+@php $f = $cfg['font']; $sp = $cfg['spacing']; @endphp
 @font-face {
     font-family: 'Tahoma';
     src: url('{{ $forPdf ? storage_path('fonts/tahoma.ttf') : asset('fonts/tahoma.ttf') }}') format('truetype');
@@ -26,7 +26,7 @@
 @page { size: 8.5in 13in; margin: 0.25in 0.35in; }
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
-body { font-family: {!! config('prospectus.font_family') !!}; font-size: 10pt; line-height: {{ $sp['line_height'] }}; color: #000; }
+body { font-family: {!! $cfg['font_family'] !!}; font-size: 10pt; line-height: {{ $sp['line_height'] }}; color: #000; }
 .sheet { width: 7.8in; margin: 0 auto; background: #fff; }
 .b { font-weight: bold; }
 .page-break { page-break-before: always; padding-top: 18pt; }

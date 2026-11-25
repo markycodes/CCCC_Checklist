@@ -121,7 +121,8 @@ class ProspectusControllerTest extends TestCase
         $this->actingAs($registrar)
             ->get(route('students.prospectus.download', $student))
             ->assertOk()
-            ->assertHeader('content-type', 'application/pdf');
+            ->assertHeader('content-type', 'application/pdf')
+            ->assertDownload('BPA-Prospectus-Students-Copy.pdf');
 
         $this->actingAs($registrar)
             ->get(route('students.prospectus.stream', $student))
