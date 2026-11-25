@@ -6,7 +6,7 @@
 @section('content')
     <div class="landing-loader" role="status" aria-label="Loading Catbalogan City Community College page">
         <div class="landing-loader-progress" aria-hidden="true"><span></span></div>
-        <img class="landing-loader-logo" src="{{ asset('assets/img/CCCClogo.webp') }}" alt="CCCC seal">
+        <img class="landing-loader-logo" src="{{ asset('assets/img/cccc.png') }}" alt="CCCC seal">
     </div>
     <main>
         <section class="portal-hero landing-hero" aria-labelledby="landing-title">

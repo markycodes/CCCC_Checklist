@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\ProgramHeadLoginController;
 use App\Http\Controllers\Registrar\DashboardController as RegistrarDashboardController;
 use App\Http\Controllers\StudentController;
@@ -16,6 +17,15 @@ Route::post('/login', [ProgramHeadLoginController::class, 'store'])
 Route::post('/logout', [ProgramHeadLoginController::class, 'destroy'])
     ->middleware('auth')
     ->name('logout');
+
+Route::get('/forgot-password', [PasswordResetController::class, 'create'])->name('password.request');
+Route::post('/forgot-password', [PasswordResetController::class, 'store'])
+    ->middleware('throttle:password-reset')
+    ->name('password.email');
+Route::get('/reset-password/{token}', [PasswordResetController::class, 'edit'])->name('password.reset');
+Route::post('/reset-password', [PasswordResetController::class, 'update'])
+    ->middleware('throttle:password-reset')
+    ->name('password.update');
 
 Route::middleware(['auth', 'administrator'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');

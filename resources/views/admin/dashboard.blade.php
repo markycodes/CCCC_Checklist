@@ -58,37 +58,14 @@
     </section>
 
     <section class="admin-grid">
-        <article class="admin-chart-card">
+        <article class="admin-chart-card admin-enrollment-chart">
             <div class="admin-card-heading"><div><span>ENROLLMENT</span><h2>Students by entry year</h2></div></div>
-            <div class="line-chart" role="img" aria-label="Enrollment line graph">
-                <div class="line-chart-bars">
-                    @foreach ($enrollment as $year => $count)
-                        @php($height = $enrollment->max() ? round(($count / $enrollment->max()) * 100) : 0)
-                        <div class="line-chart-point">
-                            <strong>{{ $count }}</strong>
-                            <span style="height: {{ max($height, 4) }}%"></span>
-                            <small>{{ $year }}</small>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
+            @include('partials.enrollment-chart', ['enrollment' => $enrollment])
         </article>
 
-        <article class="admin-chart-card">
+        <article class="admin-chart-card admin-status-chart">
             <div class="admin-card-heading"><div><span>CHECKLIST STATUS</span><h2>Student progress</h2></div></div>
-            <div class="admin-pie-layout">
-                @php($totalProgress = max(array_sum($progress), 1))
-                @php($completedPercent = round(($progress['completed'] / $totalProgress) * 100))
-                @php($inProgressPercent = round(($progress['in_progress'] / $totalProgress) * 100))
-                <div class="progress-pie" style="--completed: {{ $completedPercent }}%; --in-progress: {{ $inProgressPercent }}%" role="img" aria-label="{{ $completedPercent }} percent completed, {{ $inProgressPercent }} percent in progress">
-                    <span>{{ $totalProgress }}<small>STUDENTS</small></span>
-                </div>
-                <div class="chart-legend">
-                    <span><i class="legend-completed"></i><b>Completed</b><strong>{{ $progress['completed'] }}</strong></span>
-                    <span><i class="legend-progress"></i><b>In progress</b><strong>{{ $progress['in_progress'] }}</strong></span>
-                    <span><i class="legend-empty"></i><b>Not started</b><strong>{{ $progress['not_started'] }}</strong></span>
-                </div>
-            </div>
+            @include('partials.progress-radial-chart', ['progress' => $progress])
         </article>
     </section>
 

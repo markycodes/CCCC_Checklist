@@ -10,9 +10,17 @@
     <link rel="stylesheet" href="{{ asset('css/portal.css') }}">
     <link rel="icon" href="{{ asset('assets/img/cccc.png') }}" type="image/x-icon">
 </head>
-<body @class(['portal-body', 'landing-loader-active' => request()->routeIs('home', 'login')])>
-    <header @class(['portal-topbar', 'portal-topbar-landing' => request()->routeIs('home', 'login')])>
-        @if (request()->routeIs('home', 'login'))
+@php
+    $usesPublicHeader = request()->routeIs('home', 'login', 'password.request', 'password.reset');
+@endphp
+<body @class([
+    'portal-body',
+    'landing-loader-active' => request()->routeIs('home', 'login'),
+    'landing-home-page' => request()->routeIs('home'),
+    'internal-portal' => ! $usesPublicHeader,
+])>
+    <header @class(['portal-topbar', 'portal-topbar-landing' => $usesPublicHeader])>
+        @if ($usesPublicHeader)
             <span class="portal-topbar-curve portal-topbar-curve-left" aria-hidden="true"></span>
             <span class="portal-topbar-curve portal-topbar-curve-right" aria-hidden="true"></span>
         @endif
@@ -118,6 +126,7 @@
                 </div>
             </div>
             <nav class="portal-footer-links" aria-label="Footer navigation">
+                <span class="portal-footer-section-label">Quick links</span>
                 <a href="{{ route('home') }}">Home</a>
                 @auth
                     @if(auth()->user()->isAdministrator())
@@ -197,6 +206,16 @@
                 menu.classList.remove('is-open');
             }
         });
+
+        const landingHeader = document.querySelector('.portal-topbar-landing');
+        if (landingHeader) {
+            const updateLandingHeaderScrollState = () => {
+                landingHeader.classList.toggle('is-page-scrolled', window.scrollY > 0);
+            };
+
+            updateLandingHeaderScrollState();
+            window.addEventListener('scroll', updateLandingHeaderScrollState, { passive: true });
+        }
 
         const programDeck = document.querySelector('.landing-program-deck');
         if (programDeck) {
@@ -323,20 +342,60 @@
             const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
             const finishLandingLoader = () => {
+                const isLandingHome = document.body.classList.contains('landing-home-page');
+                const header = document.querySelector('.portal-topbar-landing');
                 const headerLogo = document.querySelector('.portal-topbar-landing .college-logo');
-                if (headerLogo && loaderLogo) {
-                    const loaderRect = loaderLogo.getBoundingClientRect();
-                    const headerRect = headerLogo.getBoundingClientRect();
-                    const deltaX = (headerRect.left + headerRect.width / 2) - (loaderRect.left + loaderRect.width / 2);
-                    const deltaY = (headerRect.top + headerRect.height / 2) - (loaderRect.top + loaderRect.height / 2);
+                const canAnimateLandingLogo = Boolean(isLandingHome && ! reduceMotion.matches && header && headerLogo && loaderLogo);
 
-                    landingLoader.style.setProperty('--loader-x', `${deltaX}px`);
-                    landingLoader.style.setProperty('--loader-y', `${deltaY}px`);
+                if (header && headerLogo && loaderLogo) {
+                    const loaderRect = loaderLogo.getBoundingClientRect();
+                    const topbarRect = header.getBoundingClientRect();
+                    const headerLogoRect = headerLogo.getBoundingClientRect();
+                    const loaderCenterX = loaderRect.left + loaderRect.width / 2;
+                    const loaderCenterY = loaderRect.top + loaderRect.height / 2;
+                    const brandCenterX = topbarRect.left + topbarRect.width / 2;
+                    const headerLogoCenterX = headerLogoRect.left + headerLogoRect.width / 2;
+                    const headerLogoCenterY = headerLogoRect.top + headerLogoRect.height / 2;
+                    const compactDeltaX = brandCenterX - loaderCenterX;
+                    const compactDeltaY = headerLogoCenterY - loaderCenterY;
+                    const brandDeltaX = headerLogoCenterX - loaderCenterX;
+
+                    landingLoader.style.setProperty('--loader-x', `${canAnimateLandingLogo ? compactDeltaX : brandDeltaX}px`);
+                    landingLoader.style.setProperty('--loader-y', `${compactDeltaY}px`);
+                    landingLoader.style.setProperty('--loader-compact-x', `${compactDeltaX}px`);
+                    landingLoader.style.setProperty('--loader-compact-y', `${compactDeltaY}px`);
+                    landingLoader.style.setProperty('--loader-brand-x', `${brandDeltaX}px`);
+                    landingLoader.style.setProperty('--loader-brand-y', `${compactDeltaY}px`);
                 }
 
                 landingLoader.classList.add('is-exiting');
+
+                if (canAnimateLandingLogo) {
+                    window.setTimeout(() => {
+                        landingLoader.classList.add('is-branding');
+                        document.body.classList.add('landing-header-expanding');
+                        window.setTimeout(() => {
+                            document.body.classList.add('landing-header-logo-ready');
+                            window.setTimeout(() => {
+                                document.body.classList.remove(
+                                    'landing-loader-active',
+                                    'landing-header-expanding',
+                                    'landing-header-logo-ready',
+                                );
+                                landingLoader.remove();
+                            }, 240);
+                        }, 1400);
+                    }, 2050);
+
+                    return;
+                }
+
                 window.setTimeout(() => {
-                    document.body.classList.remove('landing-loader-active');
+                    document.body.classList.remove(
+                        'landing-loader-active',
+                        'landing-header-expanding',
+                        'landing-header-logo-ready',
+                    );
                     landingLoader.remove();
                 }, reduceMotion.matches ? 20 : 2300);
             };
@@ -372,7 +431,7 @@
                 const isMobile = window.innerWidth <= 760;
 
                 scrollRevealShell.style.setProperty('--reveal-frame-y', `${80 * (1 - eased)}px`);
-                scrollRevealShell.style.setProperty('--reveal-frame-scale', isMobile ? (.82 + .18 * eased).toFixed(3) : (.78 + .22 * eased).toFixed(3));
+                scrollRevealShell.style.setProperty('--reveal-frame-scale', isMobile ? (.68 + .32 * eased).toFixed(3) : (.65 + .35 * eased).toFixed(3));
                 scrollRevealShell.style.setProperty('--reveal-frame-saturate', (.78 + .22 * eased).toFixed(3));
                 scrollRevealShell.style.setProperty('--reveal-heading-y', `${-34 * eased}px`);
                 scrollRevealShell.style.setProperty('--reveal-heading-opacity', (.45 + .55 * eased).toFixed(3));

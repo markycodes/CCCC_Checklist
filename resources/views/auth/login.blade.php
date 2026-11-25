@@ -26,6 +26,10 @@
                 <p>Use the staff account provided by your school administrator.</p>
             </div>
 
+            @if (session('status'))
+                <p class="form-status" role="status">{{ session('status') }}</p>
+            @endif
+
             <form method="POST" action="{{ route('login.store') }}" class="login-form">
                 @csrf
                 <label for="email">College email</label>
@@ -50,7 +54,7 @@
 
                 <div class="password-label-row">
                     <label for="password">Password</label>
-                    <span>Provided by your administrator</span>
+                    <a class="login-forgot-password" href="{{ route('password.request') }}">Forgot password?</a>
                 </div>
                 <input
                     id="password"

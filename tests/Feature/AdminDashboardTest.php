@@ -18,10 +18,67 @@ class AdminDashboardTest extends TestCase
         $this->actingAs($administrator)
             ->get(route('admin.dashboard'))
             ->assertOk()
+            ->assertSee('internal-portal', false)
             ->assertSee('Registrar overview')
             ->assertSee('Enrollment trend')
+            ->assertSee('enrollment-line-chart-svg', false)
+            ->assertSee('No enrollment data yet')
+            ->assertSee('progress-radial-svg', false)
+            ->assertSee('aria-label="Student progress: 0 completed, 0 in progress, 0 not started"', false)
             ->assertSee('Create Program Head')
             ->assertSee('program-head-modal', false);
+    }
+
+    public function test_enrollment_chart_shows_student_counts_for_each_entry_year(): void
+    {
+        $administrator = User::factory()->administrator()->create();
+        $programHead = User::factory()->programHead()->create();
+
+        $programHead->students()->createMany([
+            [
+                'student_id' => 'CCCC-CHART-001',
+                'name' => 'First Year Student',
+                'entry_year' => 2022,
+            ],
+            [
+                'student_id' => 'CCCC-CHART-002',
+                'name' => 'Second Year Student',
+                'entry_year' => 2024,
+            ],
+            [
+                'student_id' => 'CCCC-CHART-003',
+                'name' => 'Third Year Student',
+                'entry_year' => 2024,
+            ],
+        ]);
+
+        $this->actingAs($administrator)
+            ->get(route('admin.dashboard'))
+            ->assertOk()
+            ->assertSee('2022: 1 student.')
+            ->assertSee('2023: 0 students.')
+            ->assertSee('2024: 2 students.')
+            ->assertSee('aria-label="Student progress: 0 completed, 0 in progress, 3 not started"', false);
+    }
+
+    public function test_single_entry_year_still_renders_an_enrollment_line(): void
+    {
+        $administrator = User::factory()->administrator()->create();
+        $programHead = User::factory()->programHead()->create();
+
+        $programHead->students()->create([
+            'student_id' => 'CCCC-CHART-SINGLE',
+            'name' => 'Single Entry Year Student',
+            'entry_year' => 2024,
+        ]);
+
+        $this->actingAs($administrator)
+            ->get(route('admin.dashboard'))
+            ->assertOk()
+            ->assertSee('class="enrollment-trend-line" d="M 90 260 L 535 212 L 980 260"', false)
+            ->assertSee('2023: 0 students.')
+            ->assertSee('2024: 1 student.')
+            ->assertSee('2025: 0 students.');
     }
 
     public function test_program_head_cannot_open_admin_dashboard(): void
@@ -140,7 +197,8 @@ class AdminDashboardTest extends TestCase
         $this->get(route('registrar.dashboard'))
             ->assertOk()
             ->assertSee('Student overview')
-            ->assertSee('Enrollment trend');
+            ->assertSee('Enrollment trend')
+            ->assertSee('enrollment-line-chart-svg', false);
 
         $this->get(route('students.show', $student))
             ->assertOk()

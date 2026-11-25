@@ -24,37 +24,14 @@
     </section>
 
     <section class="admin-grid">
-        <article class="admin-chart-card">
+        <article class="admin-chart-card admin-enrollment-chart">
             <div class="admin-card-heading"><div><span>ENROLLMENT</span><h2>Students by entry year</h2></div></div>
-            <div class="line-chart" role="img" aria-label="Enrollment line graph">
-                <div class="line-chart-bars">
-                    @foreach ($enrollment as $year => $count)
-                        @php($height = $enrollment->max() ? round(($count / $enrollment->max()) * 100) : 0)
-                        <div class="line-chart-point">
-                            <strong>{{ $count }}</strong>
-                            <span style="height: {{ max($height, 4) }}%"></span>
-                            <small>{{ $year }}</small>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
+            @include('partials.enrollment-chart', ['enrollment' => $enrollment])
         </article>
 
-        <article class="admin-chart-card">
+        <article class="admin-chart-card admin-status-chart">
             <div class="admin-card-heading"><div><span>CHECKLIST STATUS</span><h2>Student progress</h2></div></div>
-            <div class="admin-pie-layout">
-                @php($totalProgress = max(array_sum($progress), 1))
-                @php($completedPercent = round(($progress['completed'] / $totalProgress) * 100))
-                @php($inProgressPercent = round(($progress['in_progress'] / $totalProgress) * 100))
-                <div class="progress-pie" style="--completed: {{ $completedPercent }}%; --in-progress: {{ $inProgressPercent }}%" role="img" aria-label="{{ $completedPercent }} percent completed, {{ $inProgressPercent }} percent in progress">
-                    <span>{{ $totalProgress }}<small>STUDENTS</small></span>
-                </div>
-                <div class="chart-legend">
-                    <span><i class="legend-completed"></i><b>Completed</b><strong>{{ $progress['completed'] }}</strong></span>
-                    <span><i class="legend-progress"></i><b>In progress</b><strong>{{ $progress['in_progress'] }}</strong></span>
-                    <span><i class="legend-empty"></i><b>Not started</b><strong>{{ $progress['not_started'] }}</strong></span>
-                </div>
-            </div>
+            @include('partials.progress-radial-chart', ['progress' => $progress])
         </article>
     </section>
 
@@ -96,6 +73,86 @@
                 </div>
             </div>
         </article>
+    </section>
+
+    <section class="admin-card-full registrar-grade-completion" aria-labelledby="registrar-grade-completion-title">
+        <div class="admin-card-heading">
+            <div>
+                <span>GRADE COMPLETION LOG</span>
+                <h2 id="registrar-grade-completion-title">Student grade progress by semester</h2>
+                <p>Track course grades and fully graded semesters for every student.</p>
+            </div>
+            <strong class="registrar-grade-total">{{ $gradeProgressStudentCount }} {{ \Illuminate\Support\Str::plural('student', $gradeProgressStudentCount) }}</strong>
+        </div>
+
+        <form class="registrar-grade-search" role="search" aria-label="Search students with grades" method="GET" action="{{ route('registrar.dashboard') }}">
+            <label for="registrar-grade-search">Search by student name or ID</label>
+            <div class="registrar-grade-search-controls">
+                <input
+                    id="registrar-grade-search"
+                    type="search"
+                    name="search"
+                    value="{{ $gradeSearch }}"
+                    placeholder="Name or student ID"
+                    maxlength="100"
+                    autocomplete="off"
+                    aria-controls="registrar-grade-progress-table"
+                >
+                <button class="portal-primary-button" type="submit">Search</button>
+                @if ($gradeSearch !== '')
+                    <a class="registrar-grade-clear" href="{{ route('registrar.dashboard') }}">Clear</a>
+                @endif
+            </div>
+        </form>
+
+        <p class="registrar-grade-summary" role="status">
+            @if ($gradeSearch !== '')
+                Showing {{ $gradeProgressStudents->count() }} of {{ $gradeProgressStudentCount }} students.
+            @else
+                Showing {{ $gradeProgressStudentCount }} {{ \Illuminate\Support\Str::plural('student', $gradeProgressStudentCount) }}.
+            @endif
+        </p>
+
+        <div class="admin-table-wrap">
+            <table id="registrar-grade-progress-table">
+                <thead>
+                    <tr><th>Student</th><th>Student ID</th><th>Entry year</th><th>Program Head</th><th>Semesters complete</th><th>Course grades</th><th>Grade status</th></tr>
+                </thead>
+                <tbody>
+                    @forelse ($gradeProgressStudents as $student)
+                        <tr data-grade-progress-student="{{ $student->student_id }}">
+                            <td><a href="{{ route('students.show', $student) }}">{{ $student->name }}</a></td>
+                            <td>{{ $student->student_id }}</td>
+                            <td>{{ $student->entry_year }}</td>
+                            <td>{{ $student->programHead?->name ?? 'Unassigned' }}</td>
+                            <td>{{ $student->complete_semesters_count }} / {{ $semesterCount }} semesters</td>
+                            <td>{{ $student->graded_course_count }} / {{ $curriculumCourseCount }} courses</td>
+                            <td>
+                                @if ($semesterCount > 0 && $student->complete_semesters_count === $semesterCount)
+                                    <span class="registrar-grade-status registrar-grade-status-complete">All semesters complete</span>
+                                @elseif ($student->graded_course_count > 0)
+                                    <span class="registrar-grade-status registrar-grade-status-progress">In progress</span>
+                                @else
+                                    <span class="registrar-grade-status registrar-grade-status-empty">No grades entered</span>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7">
+                                @if ($gradeSearch !== '')
+                                    No students match "{{ $gradeSearch }}".
+                                @elseif ($totalStudents > 0)
+                                    No students with grades yet.
+                                @else
+                                    No student records yet.
+                                @endif
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </section>
 
     <section id="student-trend" class="admin-card-full">

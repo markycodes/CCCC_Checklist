@@ -22,6 +22,7 @@ class ProgramHeadLoginControllerTest extends TestCase
         $this->get(route('home'))
             ->assertOk()
             ->assertSee('portal-topbar-landing', false)
+            ->assertDontSee('internal-portal', false)
             ->assertSee('Every course.')
             ->assertSee('landing-program-deck', false)
             ->assertSee('BSCRIM')
@@ -49,6 +50,9 @@ class ProgramHeadLoginControllerTest extends TestCase
     {
         $this->get(route('login'))
             ->assertOk()
+            ->assertDontSee('internal-portal', false)
+            ->assertSee(route('password.request'))
+            ->assertSee('Forgot password?')
             ->assertSee('Program Head sign in')
             ->assertSee('College email');
     }

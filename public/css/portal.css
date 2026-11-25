@@ -502,12 +502,12 @@ justify-self: end;
     flex-direction: column;
     justify-content: center;
     gap: 18px;
-    padding: 32px max(calc((100vw - 1120px) / 2), 24px);
+    padding: 32px max(calc((100vw - 1280px) / 2), 24px);
     overflow: hidden;
 }
 
 .scroll-reveal-heading {
-    max-width: 1120px;
+    max-width: 1280px;
     width: 100%;
     margin: 0 auto;
     opacity: var(--reveal-heading-opacity, 1);
@@ -529,7 +529,7 @@ justify-self: end;
 }
 
 .scroll-reveal-frame {
-    width: min(1120px, 100%);
+    width: min(1280px, 100%);
     height: min(64vh, 620px);
     margin: 0 auto;
     transform:
@@ -1111,7 +1111,7 @@ justify-self: end;
 }
 
 .scroll-reveal-frame {
-    height: min(58vh, 520px);
+    height: min(68vh, 600px);
 }
 
 .scroll-reveal-shell {
@@ -1504,7 +1504,7 @@ justify-self: end;
 
 @media (max-width: 760px) {
     .scroll-reveal-frame {
-        height: clamp(420px, 58vh, 480px);
+        height: clamp(380px, 62vh, 540px);
     }
 
     .process-visual { height: 64%; }
@@ -3634,8 +3634,22 @@ body:has(.login-backdrop-page) {
     transform: translateX(-50%);
     border-radius: 0 0 18px 18px;
     background: #fff;
-    box-shadow: none;
+    transition: width 2.2s cubic-bezier(.22, 1, .36, 1);
+    /*box-shadow:
+        0 8px 13px -7px rgba(238, 116, 44, .82),
+        0 17px 25px -12px rgba(255, 145, 54, .62);
+    transition: box-shadow .24s ease;*/
     content: '';
+}
+
+.portal-topbar-landing.is-page-scrolled::before {
+    box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .portal-topbar-landing::before {
+        transition: none;
+    }
 }
 
 .portal-topbar-curve {
@@ -3848,6 +3862,71 @@ body.landing-loader-active:has(.landing-loader.is-exiting) .portal-topbar-landin
     transition: opacity .45s ease .55s, visibility .45s ease .55s;
 }
 
+body.landing-home-page.landing-loader-active:has(.landing-loader.is-exiting) .portal-topbar-landing .college-logo {
+    opacity: 0;
+    visibility: hidden;
+    transition: none;
+}
+
+body.landing-home-page.landing-loader-active.landing-header-logo-ready:has(.landing-loader.is-exiting) .portal-topbar-landing .college-logo {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity .18s ease, visibility 0s;
+}
+
+body.landing-home-page.landing-loader-active .portal-topbar-landing::before {
+    width: 84px;
+    transition: none;
+}
+
+body.landing-home-page.landing-loader-active .portal-topbar-landing .portal-topbar-curve-left {
+    left: calc(50% - 56px);
+    opacity: 0;
+    visibility: hidden;
+    transition: none;
+}
+
+body.landing-home-page.landing-loader-active .portal-topbar-landing .portal-topbar-curve-right {
+    right: calc(50% - 56px);
+    opacity: 0;
+    visibility: hidden;
+    transition: none;
+}
+
+body.landing-home-page.landing-loader-active .portal-topbar-landing .portal-brand-copy,
+body.landing-home-page.landing-loader-active .portal-topbar-landing .portal-nav,
+body.landing-home-page.landing-loader-active .portal-topbar-landing .portal-menu-toggle {
+    opacity: 0;
+    visibility: hidden;
+}
+
+body.landing-home-page.landing-loader-active.landing-header-expanding .portal-topbar-landing::before {
+    width: min(920px, calc(100% - 24px));
+    transition: width 1.4s cubic-bezier(.22, 1, .36, 1);
+}
+
+body.landing-home-page.landing-loader-active.landing-header-expanding .portal-topbar-landing .portal-topbar-curve-left {
+    left: max(0px, calc(50.1% - 475px));
+    opacity: 1;
+    visibility: visible;
+    transition: left 1.4s cubic-bezier(.22, 1, .36, 1), opacity .25s ease .18s, visibility 0s linear .18s;
+}
+
+body.landing-home-page.landing-loader-active.landing-header-expanding .portal-topbar-landing .portal-topbar-curve-right {
+    right: max(0px, calc(50.05% - 475px));
+    opacity: 1;
+    visibility: visible;
+    transition: right 1.4s cubic-bezier(.22, 1, .36, 1), opacity .25s ease .18s, visibility 0s linear .18s;
+}
+
+body.landing-home-page.landing-loader-active.landing-header-expanding .portal-topbar-landing .portal-brand-copy,
+body.landing-home-page.landing-loader-active.landing-header-expanding .portal-topbar-landing .portal-nav,
+body.landing-home-page.landing-loader-active.landing-header-expanding .portal-topbar-landing .portal-menu-toggle {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity .3s ease .25s, visibility 0s linear .25s;
+}
+
 .landing-loader {
     position: fixed;
     z-index: 999;
@@ -3862,6 +3941,17 @@ body.landing-loader-active:has(.landing-loader.is-exiting) .portal-topbar-landin
 .landing-loader.is-exiting {
     opacity: 0;
     visibility: hidden;
+    pointer-events: none;
+}
+
+body.landing-home-page .landing-loader {
+    transition: background-color .32s ease;
+}
+
+body.landing-home-page .landing-loader.is-exiting {
+    background-color: transparent;
+    opacity: 1;
+    visibility: visible;
     pointer-events: none;
 }
 
@@ -3933,12 +4023,35 @@ body.landing-loader-active:has(.landing-loader.is-exiting) .portal-topbar-landin
 
 @keyframes landing-logo-settle {
     0% { transform: translate(0, 0) scale(1); }
-    100% { transform: translate(var(--loader-x, 0px), var(--loader-y, 0px)) scale(.321); }
+    100% { transform: translate(var(--loader-x, 0px), var(--loader-y, 0px)) scale(var(--loader-scale, .321)); }
+}
+
+@keyframes landing-logo-slide-to-brand {
+    0% { transform: translate(var(--loader-compact-x, 0px), var(--loader-compact-y, 0px)) scale(var(--loader-scale, .321)); }
+    100% { transform: translate(var(--loader-brand-x, 0px), var(--loader-brand-y, 0px)) scale(var(--loader-scale, .321)); }
+}
+
+body.landing-home-page .landing-loader.is-exiting .landing-loader-logo {
+    animation-delay: .55s;
+    animation-duration: 1.25s;
+}
+
+body.landing-home-page .landing-loader.is-branding .landing-loader-logo {
+    animation: landing-logo-slide-to-brand 1.4s cubic-bezier(.22, 1, .36, 1) both;
+}
+
+body.landing-home-page.landing-header-logo-ready .landing-loader-logo {
+    opacity: 0;
+    transition: opacity .18s ease;
 }
 
 @media (max-width: 580px) {
     .landing-loader-logo {
         --loader-size: 96px;
+    }
+
+    .landing-loader.is-exiting .landing-loader-logo {
+        --loader-scale: .375;
     }
 
     .landing-loader-progress {
@@ -3954,8 +4067,51 @@ body.landing-loader-active:has(.landing-loader.is-exiting) .portal-topbar-landin
         transition-duration: .01ms;
     }
 
+    .landing-loader.is-exiting .landing-loader-logo,
+    body.landing-home-page .landing-loader.is-branding .landing-loader-logo {
+        animation: none;
+    }
+
     .landing-loader-progress span {
         transform: scaleX(1);
+    }
+
+    body.landing-home-page.landing-loader-active .portal-topbar-landing::before {
+        width: min(920px, calc(100% - 24px));
+        transition: none;
+    }
+
+    body.landing-home-page.landing-loader-active .portal-topbar-landing .portal-topbar-curve-left {
+        left: max(0px, calc(50.1% - 475px));
+        opacity: 1;
+        visibility: visible;
+        transition: none;
+    }
+
+    body.landing-home-page.landing-loader-active .portal-topbar-landing .portal-topbar-curve-right {
+        right: max(0px, calc(50.05% - 475px));
+        opacity: 1;
+        visibility: visible;
+        transition: none;
+    }
+
+    body.landing-home-page.landing-loader-active:has(.landing-loader.is-exiting) .portal-topbar-landing .college-logo {
+        opacity: 1;
+        visibility: visible;
+        transition: none;
+    }
+
+    body.landing-home-page.landing-loader-active .portal-brand-copy,
+    body.landing-home-page.landing-loader-active .portal-nav,
+    body.landing-home-page.landing-loader-active .portal-menu-toggle,
+    body.landing-home-page.landing-loader-active .portal-topbar-curve {
+        opacity: 1;
+        visibility: visible;
+        transition: none;
+    }
+
+    body.landing-home-page.landing-loader-active:has(.landing-loader.is-exiting) .portal-topbar-landing .college-logo {
+        transition: none;
     }
 }
 
@@ -4355,4 +4511,1501 @@ body.landing-loader-active:has(.landing-loader.is-exiting) .portal-topbar-landin
         width: 70px;
         height: 70px;
     }
+}
+
+.analytics-dashboard .admin-enrollment-chart {
+    border-color: #e2e8f0;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(30, 64, 175, .04);
+}
+
+.analytics-dashboard .admin-enrollment-chart .admin-card-heading span {
+    color: #94a3b8;
+}
+
+.analytics-dashboard .admin-enrollment-chart .admin-card-heading h2 {
+    color: #1e293b;
+}
+
+.analytics-dashboard .enrollment-line-chart {
+    height: 250px;
+    display: block;
+    overflow: hidden;
+    border: 0;
+    background: none;
+}
+
+.enrollment-line-chart-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.enrollment-grid-line {
+    fill: none;
+    stroke: #dce3eb;
+    stroke-dasharray: 4 6;
+    stroke-width: 1;
+}
+
+.enrollment-axis-label,
+.enrollment-value-label,
+.enrollment-year-label,
+.enrollment-empty-label {
+    fill: #64748b;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.enrollment-axis-label,
+.enrollment-year-label {
+    font-size: 15px;
+}
+
+.enrollment-area {
+    fill: url(#enrollment-area-fill);
+}
+
+.enrollment-trend-line {
+    fill: none;
+    stroke: #00a995;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 4;
+    filter: drop-shadow(0 0 4px rgba(0, 169, 149, .2));
+}
+
+.enrollment-point-marker {
+    fill: #fff;
+    stroke: #00a995;
+    stroke-width: 4;
+}
+
+.enrollment-value-label {
+    fill: #334155;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.enrollment-empty-label {
+    fill: #8b9698;
+    font-size: 18px;
+}
+
+@media (max-width: 580px) {
+    .analytics-dashboard .enrollment-line-chart {
+        height: 210px;
+    }
+
+    .enrollment-axis-label,
+    .enrollment-year-label {
+        font-size: 18px;
+    }
+
+    .enrollment-value-label {
+        font-size: 18px;
+    }
+}
+
+.analytics-dashboard .admin-status-chart {
+    border-color: #e2e8f0;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(30, 64, 175, .04);
+}
+
+.analytics-dashboard .admin-status-chart .admin-card-heading span {
+    color: #94a3b8;
+}
+
+.analytics-dashboard .admin-status-chart .admin-card-heading h2 {
+    color: #1e293b;
+}
+
+.analytics-dashboard .admin-status-chart .admin-pie-layout {
+    grid-template-columns: minmax(160px, 180px) minmax(0, 1fr);
+    gap: 12px;
+}
+
+.analytics-dashboard .progress-pie {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    display: grid;
+    place-items: center;
+    background: none;
+}
+
+.progress-radial-svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.progress-radial-track,
+.progress-radial-fill {
+    fill: none;
+    stroke-width: 9;
+}
+
+.progress-radial-track {
+    stroke: #e2e8f0;
+}
+
+.progress-radial-fill {
+    stroke-dashoffset: var(--ring-circumference);
+    stroke-linecap: round;
+    animation: progress-ring-draw 1.15s cubic-bezier(.22, .61, .36, 1) both;
+}
+
+.radial-completed {
+    stroke: #f33b79;
+}
+
+.radial-progress {
+    stroke: #08c8b7;
+}
+
+.radial-empty {
+    stroke: #4a78ff;
+}
+
+.analytics-dashboard .progress-pie > span {
+    position: absolute;
+    z-index: 1;
+    width: 56px;
+    height: 56px;
+    border: 0;
+    background: transparent;
+    color: #1e293b;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.analytics-dashboard .progress-pie small {
+    color: #64748b;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    letter-spacing: .08em;
+}
+
+.analytics-dashboard .admin-status-chart .chart-legend span {
+    color: #475569;
+}
+
+.analytics-dashboard .admin-status-chart .chart-legend strong {
+    color: #1e293b;
+}
+
+.analytics-dashboard .admin-status-chart .legend-completed {
+    background: #f33b79;
+}
+
+.analytics-dashboard .admin-status-chart .legend-progress {
+    background: #08c8b7;
+}
+
+.analytics-dashboard .admin-status-chart .legend-empty {
+    background: #4a78ff;
+}
+
+.analytics-dashboard .line-chart-point span,
+.analytics-dashboard .monthly-line-point span {
+    transform: scaleY(0);
+    transform-origin: center bottom;
+    animation: dashboard-bar-grow .8s cubic-bezier(.22, .61, .36, 1) both;
+}
+
+.analytics-dashboard .enrollment-area {
+    opacity: 0;
+    animation: enrollment-area-fade .7s ease-out forwards;
+}
+
+.analytics-dashboard .enrollment-trend-line {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: enrollment-line-draw 1.2s cubic-bezier(.22, .61, .36, 1) forwards;
+}
+
+.analytics-dashboard .enrollment-data-point {
+    opacity: 0;
+    animation: chart-point-fade .3s ease-out forwards;
+}
+
+.analytics-dashboard .enrollment-point-marker {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: chart-marker-pop .35s cubic-bezier(.22, .61, .36, 1) both;
+}
+
+@keyframes progress-ring-draw {
+    from {
+        stroke-dashoffset: var(--ring-circumference);
+    }
+
+    to {
+        stroke-dashoffset: var(--ring-offset);
+    }
+}
+
+@keyframes dashboard-bar-grow {
+    to {
+        transform: scaleY(1);
+    }
+}
+
+@keyframes enrollment-area-fade {
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes enrollment-line-draw {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes chart-point-fade {
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes chart-marker-pop {
+    from {
+        opacity: 0;
+        transform: scale(.35);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .analytics-dashboard .progress-radial-fill,
+    .analytics-dashboard .line-chart-point span,
+    .analytics-dashboard .monthly-line-point span,
+    .analytics-dashboard .enrollment-area,
+    .analytics-dashboard .enrollment-trend-line,
+    .analytics-dashboard .enrollment-data-point,
+    .analytics-dashboard .enrollment-point-marker {
+        animation: none !important;
+        opacity: 1;
+        transform: none;
+    }
+
+    .analytics-dashboard .progress-radial-fill {
+        stroke-dashoffset: var(--ring-offset);
+    }
+
+    .analytics-dashboard .enrollment-trend-line {
+        stroke-dashoffset: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .analytics-dashboard .admin-status-chart .admin-pie-layout {
+        grid-template-columns: 132px minmax(0, 1fr);
+    }
+
+    .analytics-dashboard .admin-status-chart .progress-pie {
+        width: 132px;
+        height: 132px;
+    }
+
+    .analytics-dashboard .admin-status-chart .progress-pie > span {
+        width: 42px;
+        height: 42px;
+        font-size: 17px;
+    }
+
+    .analytics-dashboard .admin-status-chart .progress-pie small {
+        font-size: 6px;
+    }
+}
+
+@media (min-width: 761px) and (max-width: 980px) {
+    .analytics-dashboard .admin-status-chart .admin-pie-layout {
+        grid-template-columns: 150px minmax(0, 1fr);
+    }
+
+    .analytics-dashboard .admin-status-chart .progress-pie {
+        width: 150px;
+        height: 150px;
+    }
+
+    .analytics-dashboard .admin-status-chart .progress-pie > span {
+        width: 48px;
+        height: 48px;
+        font-size: 19px;
+    }
+
+    .analytics-dashboard .admin-status-chart .progress-pie small {
+        font-size: 7px;
+    }
+}
+
+.analytics-dashboard .registrar-grade-completion {
+    margin-top: 14px;
+}
+
+.registrar-grade-completion .admin-card-heading {
+    align-items: center;
+}
+
+.registrar-grade-completion .admin-card-heading p {
+    margin: 6px 0 0;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.registrar-grade-total {
+    flex: 0 0 auto;
+    color: #1e293b;
+    font-size: 13px;
+}
+
+.registrar-grade-search {
+    display: grid;
+    gap: 6px;
+    margin: 14px 0 0;
+}
+
+.registrar-grade-search > label {
+    color: #475569;
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.registrar-grade-search-controls {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.registrar-grade-search input {
+    width: min(360px, 100%);
+    min-width: 0;
+    height: 42px;
+    padding: 0 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #fff;
+    color: #1e293b;
+    font: inherit;
+}
+
+.registrar-grade-search input:focus {
+    border-color: #1e40af;
+    outline: 3px solid rgba(30, 64, 175, .14);
+    outline-offset: 1px;
+}
+
+.registrar-grade-search .portal-primary-button {
+    min-height: 42px;
+}
+
+.registrar-grade-clear {
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 8px;
+    color: #1e40af;
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.registrar-grade-summary {
+    margin: 12px 0 6px;
+    color: #64748b;
+    font-size: 11px;
+}
+
+.registrar-grade-completion .admin-table-wrap table {
+    min-width: 900px;
+}
+
+.registrar-grade-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.registrar-grade-status-complete {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.registrar-grade-status-progress {
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+.registrar-grade-status-empty {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+@media (max-width: 480px) {
+    .registrar-grade-completion .admin-card-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .registrar-grade-search-controls {
+        align-items: stretch;
+    }
+
+    .registrar-grade-search input {
+        flex-basis: 100%;
+    }
+}
+
+/* Refined visual system for authenticated pages only. */
+.portal-body.internal-portal,
+body[data-student-id] {
+    --internal-bg: #f5f6f7;
+    --internal-surface: #fff;
+    --internal-border: #e2e7ec;
+    --internal-ink: #1c2733;
+    --internal-muted: #5e6a76;
+    --internal-accent: #a94720;
+    --internal-accent-dark: #873916;
+    --internal-accent-soft: #fff2eb;
+    --internal-shadow: 0 12px 30px rgba(28, 39, 51, .055);
+}
+
+.portal-body.internal-portal {
+    background: var(--internal-bg);
+    color: var(--internal-ink);
+}
+
+.portal-body.internal-portal h1,
+.portal-body.internal-portal h2,
+.portal-body.internal-portal h3 {
+    color: var(--internal-ink);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-weight: 700;
+    letter-spacing: -.035em;
+}
+
+.portal-body.internal-portal .portal-topbar {
+    position: sticky;
+    z-index: 100;
+    top: 0;
+    min-height: 74px;
+    border-bottom: 1px solid var(--internal-border);
+    background: rgba(255, 255, 255, .96);
+    box-shadow: 0 3px 16px rgba(28, 39, 51, .045);
+    backdrop-filter: blur(12px);
+}
+
+.portal-body.internal-portal .portal-brand-copy strong {
+    color: var(--internal-ink);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 750;
+}
+
+.portal-body.internal-portal .portal-brand-copy span,
+.portal-body.internal-portal .portal-user-name {
+    color: var(--internal-muted);
+}
+
+.portal-body.internal-portal .portal-nav {
+    gap: 8px;
+}
+
+.portal-body.internal-portal .portal-nav-link {
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 13px;
+    border-radius: 999px;
+    color: #475461;
+    font-size: 12px;
+    transition: background-color .18s ease, color .18s ease;
+}
+
+.portal-body.internal-portal .portal-nav-link:hover,
+.portal-body.internal-portal .portal-nav-link.is-active {
+    background: var(--internal-accent-soft);
+    color: var(--internal-accent-dark);
+}
+
+.portal-body.internal-portal .portal-nav-link.is-active::after {
+    display: none;
+}
+
+.portal-body.internal-portal .portal-user-name {
+    padding-left: 12px;
+    border-left: 1px solid var(--internal-border);
+    font-size: 11px;
+}
+
+.portal-body.internal-portal .portal-signout,
+.portal-body.internal-portal .portal-primary-button {
+    border: 1px solid var(--internal-accent);
+    border-radius: 10px;
+    background: var(--internal-accent);
+    box-shadow: 0 5px 14px rgba(169, 71, 32, .12);
+    color: #fff;
+    transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+.portal-body.internal-portal .portal-signout {
+    min-height: 42px;
+    padding: 0 13px;
+}
+
+.portal-body.internal-portal .portal-signout:hover,
+.portal-body.internal-portal .portal-primary-button:hover {
+    border-color: var(--internal-accent-dark);
+    background: var(--internal-accent-dark);
+    box-shadow: 0 7px 18px rgba(135, 57, 22, .17);
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.portal-body.internal-portal .portal-menu-toggle {
+    border-color: var(--internal-border);
+    border-radius: 10px;
+    background: var(--internal-surface);
+}
+
+.portal-body.internal-portal .portal-menu-toggle span {
+    background: var(--internal-accent);
+}
+
+.portal-body.internal-portal .portal-footer {
+    border-top: 1px solid var(--internal-border);
+    background: var(--internal-surface);
+}
+
+.portal-body.internal-portal .analytics-dashboard {
+    background: transparent;
+}
+
+.portal-body.internal-portal .analytics-dashboard .analytics-shell {
+    width: min(1280px, calc(100% - 56px));
+    padding: 30px 0 48px;
+}
+
+.portal-body.internal-portal .analytics-dashboard .admin-heading {
+    min-height: 0;
+    margin-bottom: 22px;
+    padding: 4px 0;
+}
+
+.portal-body.internal-portal .analytics-dashboard .admin-heading h1 {
+    color: var(--internal-ink);
+    font-size: clamp(28px, 3vw, 36px);
+    font-weight: 750;
+}
+
+.portal-body.internal-portal .analytics-dashboard .admin-heading > div > p:last-child {
+    color: var(--internal-muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.portal-body.internal-portal .analytics-dashboard .portal-kicker,
+.portal-body.internal-portal .analytics-dashboard .admin-card-heading span {
+    color: #8d472a;
+}
+
+.portal-body.internal-portal .analytics-dashboard .portal-kicker > span {
+    background: var(--internal-accent);
+}
+
+.portal-body.internal-portal .analytics-dashboard .admin-metrics {
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.portal-body.internal-portal .analytics-dashboard .admin-metrics article {
+    min-height: 132px;
+    padding: 18px;
+    border: 1px solid var(--internal-border);
+    border-radius: 16px;
+    background: var(--internal-surface);
+    box-shadow: var(--internal-shadow);
+}
+
+.portal-body.internal-portal .analytics-dashboard .admin-metrics article:hover {
+    border-color: #e8c5b4;
+    box-shadow: 0 16px 34px rgba(28, 39, 51, .085);
+}
+
+.portal-body.internal-portal .analytics-dashboard .admin-metrics strong {
+    color: var(--internal-accent);
+    font-size: 30px;
+}
+
+.portal-body.internal-portal .analytics-dashboard .admin-metrics article > span:last-child,
+.portal-body.internal-portal .analytics-dashboard .admin-card-heading p {
+    color: var(--internal-muted);
+}
+
+.portal-body.internal-portal .analytics-dashboard .admin-grid,
+.portal-body.internal-portal .analytics-dashboard .admin-grid-secondary {
+    gap: 18px;
+}
+
+.portal-body.internal-portal .analytics-dashboard .admin-grid-secondary {
+    margin-top: 18px;
+}
+
+.portal-body.internal-portal .analytics-dashboard .admin-chart-card,
+.portal-body.internal-portal .analytics-dashboard .admin-table-card,
+.portal-body.internal-portal .analytics-dashboard .admin-create-card,
+.portal-body.internal-portal .analytics-dashboard .admin-card-full {
+    border: 1px solid var(--internal-border);
+    border-radius: 16px;
+    background: var(--internal-surface);
+    box-shadow: var(--internal-shadow);
+}
+
+.portal-body.internal-portal .analytics-dashboard .admin-chart-card,
+.portal-body.internal-portal .analytics-dashboard .admin-table-card,
+.portal-body.internal-portal .analytics-dashboard .admin-card-full {
+    padding: 20px;
+}
+
+.portal-body.internal-portal .analytics-dashboard .admin-card-heading {
+    margin-bottom: 14px;
+}
+
+.portal-body.internal-portal .analytics-dashboard .admin-card-heading span {
+    font-size: 10px;
+}
+
+.portal-body.internal-portal .analytics-dashboard .admin-card-heading h2,
+.portal-body.internal-portal .analytics-dashboard .admin-create-card h2 {
+    color: var(--internal-ink);
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.portal-body.internal-portal .analytics-dashboard .admin-table-wrap table {
+    font-size: 12px;
+}
+
+.portal-body.internal-portal .analytics-dashboard .admin-table-wrap th {
+    padding: 12px 10px;
+    background: #f7f8fa;
+    color: #52606d;
+    font-size: 10px;
+}
+
+.portal-body.internal-portal .analytics-dashboard .admin-table-wrap td {
+    padding: 13px 10px;
+    color: #394652;
+    font-size: 12px;
+}
+
+.portal-body.internal-portal .analytics-dashboard .admin-table-wrap td a {
+    color: var(--internal-accent-dark);
+}
+
+.portal-body.internal-portal .analytics-dashboard .admin-table-wrap tr:hover td {
+    background: #fffaf7;
+}
+
+.portal-body.internal-portal .analytics-dashboard .line-chart,
+.portal-body.internal-portal .analytics-dashboard .monthly-line-chart {
+    border-color: var(--internal-border);
+}
+
+.portal-body.internal-portal .analytics-dashboard .line-chart-point span,
+.portal-body.internal-portal .analytics-dashboard .monthly-line-point span {
+    background: var(--internal-accent);
+}
+
+.portal-body.internal-portal .analytics-dashboard .progress-pie {
+    background: conic-gradient(
+        var(--internal-accent) 0 var(--completed),
+        #d58a61 var(--completed) calc(var(--completed) + var(--in-progress)),
+        #e9edf0 0
+    );
+}
+
+.portal-body.internal-portal .analytics-dashboard .legend-completed {
+    background: var(--internal-accent);
+}
+
+.portal-body.internal-portal .analytics-dashboard .legend-progress {
+    background: #d58a61;
+}
+
+.portal-body.internal-portal .account-modal-panel {
+    border-color: var(--internal-border);
+    border-radius: 18px;
+    box-shadow: 0 24px 70px rgba(28, 39, 51, .2);
+}
+
+.portal-body.internal-portal .records-page {
+    width: min(1280px, calc(100% - 56px));
+    padding-top: 38px;
+    padding-bottom: 56px;
+}
+
+.portal-body.internal-portal .records-heading {
+    padding-bottom: 24px;
+    border-color: var(--internal-border);
+}
+
+.portal-body.internal-portal .records-heading h1 {
+    color: var(--internal-ink);
+    font-size: clamp(28px, 3vw, 36px);
+    font-weight: 750;
+}
+
+.portal-body.internal-portal .records-heading > div:first-child > p:last-child,
+.portal-body.internal-portal .records-list-heading p,
+.portal-body.internal-portal .student-form-card > p {
+    color: var(--internal-muted);
+    line-height: 1.6;
+}
+
+.portal-body.internal-portal .records-count strong {
+    color: var(--internal-accent);
+}
+
+.portal-body.internal-portal .records-layout {
+    gap: 24px;
+}
+
+.portal-body.internal-portal .student-card {
+    min-height: 88px;
+    border-color: var(--internal-border);
+    border-radius: 14px;
+    background: var(--internal-surface);
+    box-shadow: 0 5px 16px rgba(28, 39, 51, .035);
+}
+
+.portal-body.internal-portal .student-card:hover {
+    border-color: #e4b7a0;
+    box-shadow: 0 12px 26px rgba(28, 39, 51, .075);
+}
+
+.portal-body.internal-portal .student-avatar {
+    background: var(--internal-accent-soft);
+    color: var(--internal-accent-dark);
+}
+
+.portal-body.internal-portal .student-card-main > strong {
+    color: var(--internal-ink);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-weight: 700;
+}
+
+.portal-body.internal-portal .student-card-main > span,
+.portal-body.internal-portal .student-card-progress small {
+    color: var(--internal-muted);
+}
+
+.portal-body.internal-portal .student-card-progress > span {
+    height: 6px;
+    background: #e9edf0;
+}
+
+.portal-body.internal-portal .student-card-progress > span > i {
+    background: var(--internal-accent);
+}
+
+.portal-body.internal-portal .student-form-card {
+    border: 1px solid var(--internal-border);
+    border-top: 4px solid var(--internal-accent);
+    border-radius: 16px;
+    background: var(--internal-surface);
+    box-shadow: var(--internal-shadow);
+}
+
+.portal-body.internal-portal .student-form-card h2,
+.portal-body.internal-portal .records-list-heading h2 {
+    color: var(--internal-ink);
+    font-size: 21px;
+}
+
+.portal-body.internal-portal .student-create-form > label,
+.portal-body.internal-portal .student-edit-form label,
+.portal-body.internal-portal .student-search,
+.portal-body.internal-portal .school-year-filter {
+    color: #344250;
+}
+
+.portal-body.internal-portal .student-create-form input,
+.portal-body.internal-portal .student-create-form select,
+.portal-body.internal-portal .student-edit-form input,
+.portal-body.internal-portal .student-search input,
+.portal-body.internal-portal .school-year-filter select,
+.portal-body.internal-portal .registrar-grade-search input {
+    border-color: #cbd4dd;
+    border-radius: 9px;
+    background: #fff;
+    color: var(--internal-ink);
+}
+
+.portal-body.internal-portal .student-create-form :is(input, select):focus,
+.portal-body.internal-portal .student-edit-form input:focus,
+.portal-body.internal-portal .student-search input:focus,
+.portal-body.internal-portal .school-year-filter select:focus,
+.portal-body.internal-portal .registrar-grade-search input:focus {
+    border-color: var(--internal-accent);
+    outline: 3px solid rgba(169, 71, 32, .16);
+    outline-offset: 1px;
+}
+
+.portal-body.internal-portal .records-empty {
+    border-color: #d6dee6;
+    border-radius: 14px;
+    background: var(--internal-surface);
+}
+
+.portal-body.internal-portal .student-record-bar,
+.portal-body.internal-portal .form-status {
+    border-color: var(--internal-border);
+    border-radius: 12px;
+    background: var(--internal-surface);
+    box-shadow: 0 6px 18px rgba(28, 39, 51, .04);
+}
+
+.portal-body.internal-portal .student-status {
+    border-color: #f0d2c3;
+    border-radius: 10px;
+    background: #fff5f0;
+    color: #753b23;
+}
+
+.portal-body.internal-portal .registrar-grade-completion .admin-table-wrap th {
+    white-space: nowrap;
+}
+
+body[data-student-id] {
+    background: var(--internal-bg);
+    color: var(--internal-ink);
+}
+
+body[data-student-id] .topbar {
+    min-height: 74px;
+    height: auto;
+    border-bottom-color: var(--internal-border);
+    background: rgba(255, 255, 255, .96);
+    box-shadow: 0 3px 16px rgba(28, 39, 51, .045);
+}
+
+body[data-student-id] .brand-copy strong {
+    color: var(--internal-ink);
+}
+
+body[data-student-id] .brand-copy span,
+body[data-student-id] .account-name {
+    color: var(--internal-muted);
+}
+
+body[data-student-id] .topbar-link.is-active {
+    min-height: 42px;
+    padding: 0 12px;
+    border-radius: 999px;
+    background: var(--internal-accent-soft);
+    color: var(--internal-accent-dark);
+}
+
+body[data-student-id] .topbar-link.is-active::after {
+    display: none;
+}
+
+body[data-student-id] .account-name {
+    padding: 8px 12px;
+    border: 0;
+    border-radius: 999px;
+    background: #f2f4f6;
+    font-size: 11px;
+}
+
+body[data-student-id] .logout-button {
+    border-radius: 10px;
+    background: #fff;
+}
+
+body[data-student-id] .page-shell {
+    max-width: 1320px;
+    padding-right: clamp(18px, 4vw, 48px);
+    padding-left: clamp(18px, 4vw, 48px);
+}
+
+body[data-student-id] .student-record-bar,
+body[data-student-id] .student-curriculum-summary,
+body[data-student-id] .stat-card,
+body[data-student-id] .semester-panel,
+body[data-student-id] .student-switcher,
+body[data-student-id] .year-rail {
+    border-color: var(--internal-border);
+    border-radius: 14px;
+    background: var(--internal-surface);
+    box-shadow: var(--internal-shadow);
+}
+
+body[data-student-id] .student-record-bar {
+    margin-top: 24px;
+    padding: 16px 18px;
+}
+
+body[data-student-id] .student-record-label {
+    color: var(--internal-accent-dark);
+}
+
+body[data-student-id] .student-record-summary strong {
+    color: var(--internal-ink);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-weight: 700;
+}
+
+body[data-student-id] .student-record-summary > span:not(.student-record-label) {
+    color: var(--internal-muted);
+}
+
+body[data-student-id] .student-edit summary {
+    color: var(--internal-accent-dark);
+}
+
+body[data-student-id] .student-edit-form {
+    border-color: var(--internal-border);
+    border-radius: 14px;
+    background: var(--internal-surface);
+    box-shadow: var(--internal-shadow);
+}
+
+body[data-student-id] .welcome-row {
+    min-height: 270px;
+    gap: 28px;
+    margin-top: 22px;
+    padding: 24px 30px;
+    border: 1px solid #f0ded4;
+    border-radius: 20px;
+    background: linear-gradient(120deg, #fff 0%, #fff8f4 100%);
+    box-shadow: var(--internal-shadow);
+}
+
+body[data-student-id] .welcome-copy {
+    max-width: 610px;
+}
+
+body[data-student-id] .welcome-copy h1 {
+    color: var(--internal-ink);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: clamp(36px, 4vw, 50px);
+    font-weight: 750;
+    letter-spacing: -.045em;
+}
+
+body[data-student-id] .welcome-copy h1 span,
+body[data-student-id] .student-curriculum-summary > div strong {
+    color: var(--internal-accent);
+}
+
+body[data-student-id] .welcome-intro,
+body[data-student-id] .section-subtitle,
+body[data-student-id] .stat-detail {
+    color: var(--internal-muted);
+    line-height: 1.65;
+}
+
+body[data-student-id] .student-curriculum-summary {
+    border-left: 4px solid var(--internal-accent);
+    border-radius: 14px;
+}
+
+body[data-student-id] .student-curriculum-summary > strong {
+    color: var(--internal-ink);
+}
+
+body[data-student-id] .dashboard {
+    padding-top: 34px;
+}
+
+body[data-student-id] .dashboard-heading h2,
+body[data-student-id] .curriculum-heading h2 {
+    color: var(--internal-ink);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-weight: 750;
+}
+
+body[data-student-id] .save-note {
+    color: var(--internal-muted);
+}
+
+body[data-student-id] .stats-grid {
+    gap: 14px;
+    margin-top: 20px;
+}
+
+body[data-student-id] .stat-card {
+    min-height: 148px;
+    padding: 20px;
+}
+
+body[data-student-id] .stat-label,
+body[data-student-id] .student-curriculum-summary > span:first-child {
+    color: #566473;
+}
+
+body[data-student-id] .stat-value {
+    color: var(--internal-ink);
+}
+
+body[data-student-id] .stat-next {
+    border-color: var(--internal-accent);
+    background: var(--internal-accent);
+    color: #fff;
+}
+
+body[data-student-id] .stat-next .stat-label,
+body[data-student-id] .stat-next .stat-detail {
+    color: #fff1e9;
+}
+
+body[data-student-id] .text-link {
+    color: #ffe2d2;
+}
+
+body[data-student-id] .progress-ring {
+    background: conic-gradient(var(--internal-accent) var(--progress), #e5e9ed 0);
+}
+
+body[data-student-id] .curriculum-section {
+    margin-top: 22px;
+    padding-top: 28px;
+    border-top-color: var(--internal-border);
+}
+
+body[data-student-id] .curriculum-layout {
+    gap: 16px;
+}
+
+body[data-student-id] .semester-panel {
+    overflow: hidden;
+}
+
+body[data-student-id] .semester-header {
+    background: #fff;
+}
+
+body[data-student-id] .semester-heading h3 {
+    color: var(--internal-ink);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-weight: 700;
+}
+
+body[data-student-id] .semester-kicker,
+body[data-student-id] .term-progress-copy strong {
+    color: var(--internal-accent-dark);
+}
+
+body[data-student-id] .semester-tabs {
+    border-color: var(--internal-border);
+    border-radius: 9px;
+    background: #f4f6f8;
+}
+
+body[data-student-id] .semester-tab {
+    min-height: 36px;
+    border-radius: 7px;
+}
+
+body[data-student-id] .semester-tab.is-active {
+    background: var(--internal-surface);
+    color: var(--internal-accent-dark);
+}
+
+body[data-student-id] .course-list-head {
+    background: #f6f8fa;
+    color: #536170;
+    font-size: 9px;
+}
+
+body[data-student-id] .course-row {
+    min-height: 64px;
+    border-top-color: #edf0f3;
+}
+
+body[data-student-id] .course-row:hover {
+    background: #fffaf7;
+}
+
+body[data-student-id] .course-title {
+    color: #263441;
+    font-size: 12px;
+}
+
+body[data-student-id] .course-code,
+body[data-student-id] .course-credit {
+    color: var(--internal-muted);
+    font-size: 10px;
+}
+
+body[data-student-id] .course-checkbox {
+    border-radius: 6px;
+}
+
+body[data-student-id] .course-checkbox:checked,
+body[data-student-id] .term-progress-track span,
+body[data-student-id] .student-switcher-progress i {
+    border-color: var(--internal-accent);
+    background: var(--internal-accent);
+}
+
+body[data-student-id] .course-grade-input,
+body[data-student-id] .student-switcher-search input {
+    border-color: #cbd4dd;
+    border-radius: 8px;
+    color: var(--internal-ink);
+}
+
+body[data-student-id] .course-grade-input:focus,
+body[data-student-id] .student-switcher-search input:focus {
+    border-color: var(--internal-accent);
+    outline: 3px solid rgba(169, 71, 32, .16);
+}
+
+body[data-student-id] .student-switcher-item {
+    min-height: 68px;
+    border-radius: 9px;
+}
+
+body[data-student-id] .student-switcher-item.is-active {
+    border-color: #edcbbb;
+    background: var(--internal-accent-soft);
+}
+
+body[data-student-id] .student-switcher-copy strong {
+    color: var(--internal-ink);
+}
+
+body[data-student-id] .student-switcher-copy > span {
+    color: var(--internal-muted);
+}
+
+body[data-student-id] .page-footer {
+    border-top-color: var(--internal-border);
+    color: var(--internal-muted);
+}
+
+body[data-student-id] .footer-brand {
+    color: var(--internal-ink);
+}
+
+@media (max-width: 900px) {
+    .portal-body.internal-portal .records-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .portal-body.internal-portal .student-form-card {
+        max-width: 640px;
+    }
+
+    body[data-student-id] .welcome-row {
+        padding: 22px;
+    }
+}
+
+@media (max-width: 760px) {
+    .portal-body.internal-portal .analytics-dashboard .analytics-shell {
+        width: calc(100% - 32px);
+        padding-top: 22px;
+    }
+
+    .portal-body.internal-portal .analytics-dashboard .admin-heading {
+        align-items: flex-start;
+        gap: 14px;
+    }
+
+    .portal-body.internal-portal .analytics-dashboard .admin-card-full {
+        overflow: hidden;
+    }
+
+    .portal-body.internal-portal .records-page {
+        width: calc(100% - 32px);
+        padding-top: 28px;
+    }
+
+    .portal-body.internal-portal .records-layout {
+        gap: 18px;
+    }
+
+    body[data-student-id] .page-shell {
+        padding-right: 20px;
+        padding-left: 20px;
+    }
+
+    body[data-student-id] .stats-grid {
+        gap: 10px;
+    }
+
+    body[data-student-id] .stat-card {
+        padding: 16px;
+    }
+}
+
+@media (max-width: 650px) {
+    body[data-student-id] .topbar {
+        min-height: 68px;
+        height: 68px;
+        padding-right: 18px;
+        padding-left: 18px;
+    }
+
+    body[data-student-id] .welcome-row {
+        min-height: 0;
+        align-items: stretch;
+        flex-direction: column;
+        gap: 16px;
+        padding: 20px 16px;
+    }
+
+    body[data-student-id] .welcome-copy {
+        padding: 8px 0 10px;
+    }
+
+    body[data-student-id] .student-curriculum-summary {
+        width: 100%;
+        flex-basis: auto;
+        margin-bottom: 0;
+    }
+
+    body[data-student-id] .curriculum-layout {
+        gap: 12px;
+    }
+
+    body[data-student-id] .semester-panel {
+        border-radius: 12px;
+    }
+
+    body[data-student-id] .course-title {
+        font-size: 11px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .portal-body.internal-portal *,
+    .portal-body.internal-portal *::before,
+    .portal-body.internal-portal *::after,
+    body[data-student-id] *,
+    body[data-student-id] *::before,
+    body[data-student-id] *::after {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+@media (min-width: 1680px) {
+    body[data-student-id] .student-switcher {
+        margin-right: -70px;
+    }
+}
+
+.portal-body .portal-footer.portal-footer-design {
+    min-height: 0;
+    display: block;
+    overflow: hidden;
+    padding: 0;
+    border-top: 3px solid #d27a4d;
+    background: #fff;
+    color: #3f4856;
+    font-size: 12px;
+}
+
+.portal-footer-main {
+    width: min(1120px, calc(100% - 48px));
+    min-height: 236px;
+    grid-template-columns: minmax(280px, 1.1fr) minmax(150px, .55fr) minmax(320px, 1.2fr);
+    gap: clamp(24px, 4vw, 56px);
+    padding: 38px 0;
+}
+
+.portal-footer-brand {
+    gap: 16px;
+}
+
+.portal-footer-brand img {
+    flex: 0 0 64px;
+    width: 64px;
+    height: 68px;
+    padding: 7px;
+    border: 1px solid #e8e2d9;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 8px 18px rgba(31, 41, 55, .08);
+}
+
+.portal-footer-brand div {
+    gap: 7px;
+}
+
+.portal-footer-brand strong {
+    max-width: 250px;
+    color: #252b36;
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+.portal-footer-brand span {
+    color: #625a50;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.portal-footer-links {
+    gap: 7px;
+}
+
+.portal-footer-section-label,
+.portal-footer-partners > span {
+    margin-bottom: 5px;
+    color: #a94720;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+}
+
+.portal-footer-links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 32px;
+    color: #3f4856;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color .18s ease, transform .18s ease;
+}
+
+.portal-footer-links a::before {
+    width: 5px;
+    height: 5px;
+    flex: 0 0 5px;
+    border-radius: 50%;
+    background: #dc8357;
+    content: "";
+}
+
+.portal-footer-links a:hover {
+    color: #a94720;
+    transform: translateX(3px);
+}
+
+.portal-footer-partners {
+    gap: 13px;
+}
+
+.portal-footer-partners > div {
+    grid-template-columns: repeat(3, minmax(64px, 76px));
+    gap: 12px;
+}
+
+.portal-footer-partners img {
+    width: 76px;
+    height: 76px;
+    padding: 7px;
+    border: 1px solid #e8e2d9;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 8px 18px rgba(31, 41, 55, .08);
+}
+
+.portal-footer-bottom {
+    min-height: 58px;
+    padding: 12px max(calc((100vw - 1120px) / 2), 24px);
+    border-top-color: #ece7e0;
+    color: #625a50;
+    font-size: 11px;
+}
+
+.portal-footer-bottom span:last-child {
+    color: #a94720;
+    font-weight: 600;
+}
+
+@media (max-width: 760px) {
+    .portal-footer-main {
+        width: calc(100% - 40px);
+        min-height: 0;
+        grid-template-columns: 1fr;
+        gap: 26px;
+        padding: 32px 0;
+    }
+
+    .portal-footer-links {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 4px 16px;
+    }
+
+    .portal-footer-section-label {
+        grid-column: 1 / -1;
+    }
+
+    .portal-footer-partners > div {
+        grid-template-columns: repeat(3, minmax(60px, 72px));
+        gap: 10px;
+    }
+
+    .portal-footer-partners img {
+        width: 72px;
+        height: 72px;
+    }
+
+    .portal-footer-bottom {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
+        padding: 14px 20px;
+    }
+}
+
+@media (max-width: 400px) {
+    .portal-footer-brand img {
+        flex-basis: 56px;
+        width: 56px;
+        height: 60px;
+    }
+
+    .portal-footer-partners > div {
+        grid-template-columns: repeat(3, minmax(56px, 68px));
+        gap: 8px;
+    }
+
+    .portal-footer-partners img {
+        width: 68px;
+        height: 68px;
+    }
+}
+
+.login-forgot-password {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    color: #93421e;
+    font-size: 11px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.login-forgot-password:hover {
+    color: #b84f24;
+    text-decoration: underline;
+}
+
+.login-forgot-password:focus-visible {
+    outline: 2px solid #b45b32;
+    outline-offset: 3px;
 }
