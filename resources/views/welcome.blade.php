@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>{{ config('app.name', 'Laravel') }}</title>
-    <link rel="icon" href="{{ asset('assets/img/CCCClogo.webp') }}" type="image/x-icon">
+    <link rel="icon" href="{{ asset('assets/img/cccc.png') }}" type="image/x-icon">
     @fonts
 
     <!-- Styles / Scripts -->

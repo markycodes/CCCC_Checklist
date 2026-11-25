@@ -14,12 +14,14 @@ Artisan::command('inspire', function () {
 Artisan::command('program-head:create', function () {
     $name = trim($this->ask('Program Head full name'));
     $email = Str::lower(trim($this->ask('College email address')));
+    $program = Str::upper(trim($this->ask('Prospectus program identifier', 'BPA')));
 
     $validator = Validator::make(
-        ['name' => $name, 'email' => $email],
+        ['name' => $name, 'email' => $email, 'program' => $program],
         [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'program' => ['required', 'string', 'max:20', 'in:BPA,BSCRIM,BSISM,BSENTREP,BSOA'],
         ],
     );
 
@@ -48,6 +50,7 @@ Artisan::command('program-head:create', function () {
         'email' => $email,
         'password' => $password,
         'role' => User::ROLE_PROGRAM_HEAD,
+        'program' => $program,
     ]);
 
     $this->info("Program Head account created for {$user->email}.");

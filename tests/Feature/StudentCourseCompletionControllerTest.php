@@ -10,7 +10,7 @@ class StudentCourseCompletionControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_registrar_cannot_enter_course_grades(): void
+    public function test_registrar_can_enter_grades_across_programs(): void
     {
         $registrar = User::factory()->registrar()->create();
         $programHead = User::factory()->programHead()->create();
@@ -24,9 +24,17 @@ class StudentCourseCompletionControllerTest extends TestCase
             ->putJson(route('students.courses.complete', [$student, 'GED 1003']), [
                 'grade' => 2.00,
             ])
-            ->assertForbidden();
+            ->assertOk()
+            ->assertExactJson([
+                'completed' => true,
+                'grade' => '2.00',
+            ]);
 
-        $this->assertDatabaseCount('student_course_completions', 0);
+        $this->assertDatabaseHas('student_course_completions', [
+            'student_id' => $student->id,
+            'course_code' => 'GED 1003',
+            'grade' => 2.00,
+        ]);
     }
 
     public function test_program_head_can_save_course_completion_for_a_student(): void
@@ -112,6 +120,36 @@ class StudentCourseCompletionControllerTest extends TestCase
             'course_code' => 'GED 1003',
             'grade' => 3.50,
         ]);
+    }
+
+    public function test_grade_boundary_marks_only_three_as_failing(): void
+    {
+        $programHead = User::factory()->programHead()->create();
+        $student = $programHead->students()->create([
+            'student_id' => 'CCCC-GRADE-BOUNDARY',
+            'name' => 'Boundary Grade Student',
+            'entry_year' => 2024,
+        ]);
+
+        $this->actingAs($programHead)
+            ->putJson(route('students.courses.complete', [$student, 'GED 1003']), [
+                'grade' => 2.99,
+            ])
+            ->assertOk()
+            ->assertExactJson([
+                'completed' => true,
+                'grade' => '2.99',
+            ]);
+
+        $this->actingAs($programHead)
+            ->putJson(route('students.courses.complete', [$student, 'GED 1003']), [
+                'grade' => 3.00,
+            ])
+            ->assertOk()
+            ->assertExactJson([
+                'completed' => false,
+                'grade' => '3.00',
+            ]);
     }
 
     public function test_grade_must_be_within_the_philippine_scale(): void

@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Student;
 use App\Models\StudentCourseCompletion;
+use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class ProspectusController extends Controller
 {
@@ -38,6 +40,17 @@ class ProspectusController extends Controller
     private function data(bool $forPdf, ?Student $student = null): array
     {
         $cfg = config('prospectus');
+
+        $program = User::PROGRAM_BPA;
+        if ($student?->programHead) {
+            $program = Str::upper(trim((string) $student->programHead->program));
+        } elseif (auth()->user()?->isProgramHead()) {
+            $program = Str::upper(trim((string) auth()->user()->program));
+        }
+
+        if (! in_array($program, config('prospectus.templates', [User::PROGRAM_BPA]), true)) {
+            $program = User::PROGRAM_BPA;
+        }
 
         if ($student) {
             $this->authorize('view', $student);

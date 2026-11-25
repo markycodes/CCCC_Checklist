@@ -10,8 +10,7 @@ class StudentPolicy
 {
     public function view(User $user, Student $student): Response
     {
-        return ($user->isAdministrator()
-            || $user->isRegistrar()
+        return ($user->canViewAllPrograms()
             || ($user->isProgramHead() && $student->user_id === $user->id))
             ? Response::allow()
             : Response::denyAsNotFound();
@@ -19,8 +18,7 @@ class StudentPolicy
 
     public function update(User $user, Student $student): Response
     {
-        return ($user->isAdministrator()
-            || $user->isRegistrar()
+        return ($user->canViewAllPrograms()
             || ($user->isProgramHead() && $student->user_id === $user->id))
             ? Response::allow()
             : Response::denyAsNotFound();
@@ -28,8 +26,7 @@ class StudentPolicy
 
     public function delete(User $user, Student $student): Response
     {
-        return ($user->isAdministrator()
-            || $user->isRegistrar()
+        return ($user->canViewAllPrograms()
             || ($user->isProgramHead() && $student->user_id === $user->id))
             ? Response::allow()
             : Response::denyAsNotFound();

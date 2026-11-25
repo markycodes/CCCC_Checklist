@@ -44,7 +44,7 @@
 <table class="ct">
 <thead><tr class="t-colhead"><th style="width:{{ $cfg['cols'][0] }}">Course Code</th><th style="width:{{ $cfg['cols'][1] }}">Course Title</th><th style="width:{{ $cfg['cols'][2] }}">Lecture<br><span class="reg">(Hours)</span></th><th style="width:{{ $cfg['cols'][3] }}">Lab<br><span class="reg">(Hours)</span></th><th style="width:{{ $cfg['cols'][4] }}">Credit<br><span class="reg">(Units)</span></th><th style="width:{{ $cfg['cols'][5] }}">Pre-requisite<br><span class="reg">Co-requisite</span></th></tr></thead><tbody>
 @foreach ($sem['courses'] as $c)
-<tr class="t-row"><td><span @class(['chk', 'chk-grade' => !empty($c[6])])>{{ $c[6] ?? '' }}</span>{{ $c[0] }}</td><td>{{ $c[1] }}</td><td>{{ $c[2] }}</td><td>{{ $c[3] }}</td><td>{{ $c[4] }}</td><td>{{ $c[5] }}</td></tr>
+<tr class="t-row"><td><span @class(['chk', 'chk-grade' => !empty($c[6]), 'chk-failing' => isset($c[6]) && (float) $c[6] >= 3])>{{ $c[6] ?? '' }}</span>{{ $c[0] }}</td><td>{{ $c[1] }}</td><td>{{ $c[2] }}</td><td>{{ $c[3] }}</td><td>{{ $c[4] }}</td><td>{{ $c[5] }}</td></tr>
 @endforeach
 <tr class="t-total"><td colspan="2" class="lbl">Total Units</td><td>{{ $lec }}</td><td>{{ $lab }}</td><td>{{ $cr }}</td><td></td></tr>
 @if (!empty($sem['show_grand_total']))

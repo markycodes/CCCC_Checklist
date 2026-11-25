@@ -62,6 +62,41 @@ class StudentControllerTest extends TestCase
             ->assertSee('View all student records');
     }
 
+    public function test_administrator_and_registrar_can_view_students_across_programs(): void
+    {
+        $bpaHead = User::factory()->programHead()->create(['program' => 'BPA']);
+        $bscrimHead = User::factory()->programHead()->create(['program' => 'BSCRIM']);
+
+        $bpaStudent = $bpaHead->students()->create([
+            'student_id' => 'CCCC-BPA-001',
+            'name' => 'BPA Student',
+            'entry_year' => 2024,
+        ]);
+        $bscrimStudent = $bscrimHead->students()->create([
+            'student_id' => 'CCCC-BSCRIM-001',
+            'name' => 'BSCRIM Student',
+            'entry_year' => 2024,
+        ]);
+
+        foreach ([User::ROLE_ADMINISTRATOR, User::ROLE_REGISTRAR] as $role) {
+            $staff = User::factory()->create(['role' => $role]);
+
+            $this->actingAs($staff)
+                ->get(route('students.index'))
+                ->assertOk()
+                ->assertSee('BPA Student')
+                ->assertSee('BSCRIM Student');
+
+            $this->get(route('students.show', $bpaStudent))
+                ->assertOk()
+                ->assertSee('BPA Student');
+
+            $this->get(route('students.show', $bscrimStudent))
+                ->assertOk()
+                ->assertSee('BSCRIM Student');
+        }
+    }
+
     public function test_duplicate_student_id_is_rejected_for_the_same_program_head(): void
     {
         $programHead = User::factory()->programHead()->create();

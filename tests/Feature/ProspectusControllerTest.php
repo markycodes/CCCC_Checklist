@@ -64,7 +64,7 @@ class ProspectusControllerTest extends TestCase
             ->assertSee('Samar State University')
             ->assertSee('Last year attended: 2023-2024')
             ->assertSee('<span class="chk chk-grade">2.25</span>', false)
-            ->assertSee('<span class="chk chk-grade">3.25</span>PATHFit 2103', false)
+            ->assertSee('<span class="chk chk-grade chk-failing">3.25</span>PATHFit 2103', false)
             ->assertSee('<span class="chk"></span>GED 1006', false);
 
         $this->assertSame(3, substr_count($preview->getContent(), 'class="student-field-value'));

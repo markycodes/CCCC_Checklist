@@ -101,6 +101,7 @@ class DashboardController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:12', 'confirmed'],
+            'program' => ['required', 'string', 'max:20', 'in:BPA,BSCRIM,BSISM,BSENTREP,BSOA'],
         ]);
 
         User::create([
@@ -108,6 +109,7 @@ class DashboardController extends Controller
             'email' => Str::lower(trim($validated['email'])),
             'password' => $validated['password'],
             'role' => User::ROLE_PROGRAM_HEAD,
+            'program' => Str::upper($validated['program']),
         ]);
 
         return redirect()

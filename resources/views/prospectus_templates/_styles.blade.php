@@ -73,6 +73,7 @@ table.gb { width: 100%; border-collapse: collapse; }
 table.ct { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .chk { display: inline-block; width: 14pt; border-bottom: 0.75pt solid #000; height: 8pt; margin-right: 2pt; vertical-align: baseline; }
 .chk-grade { width: 21pt; font-size: 9pt; font-weight: bold; line-height: 1; text-align: center; }
+.chk-failing { color: #dc2626; border-bottom-color: #dc2626; }
 .t-row td:first-child { white-space: nowrap; }
 
 .sum-title { font-family: 'Arial Narrow', sans-serif; font-size: 11pt; font-weight: bold; text-align: center; border-top: 1.2pt solid #000; margin-top: 16pt; padding-top: 1pt; }

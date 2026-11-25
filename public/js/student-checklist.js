@@ -9,7 +9,7 @@
     let courseGrades = new Map(Object.entries(window.completedCourseGrades || {}));
     let completed = new Set(
         [...courseGrades.entries()]
-            .filter(([, grade]) => grade === null || (grade >= 1 && grade <= 3))
+            .filter(([, grade]) => grade !== null && grade >= 1 && grade < 3)
             .map(([code]) => code),
     );
     let activeYear = 0;
@@ -119,6 +119,7 @@
             const savedGrade = courseGrades.get(course.code);
             if (savedGrade !== undefined && savedGrade !== null) {
                 gradeInput.value = Number(savedGrade).toFixed(2);
+                gradeInput.classList.toggle('is-failing-grade', Number(savedGrade) >= 3);
             }
 
             let gradeTimer;
@@ -147,7 +148,8 @@
             const rowGrade = courseGrades.get(course.code);
             status.textContent = rowGrade === undefined || rowGrade === null
                 ? 'Grade needed'
-                : (rowGrade >= 1 && rowGrade <= 3 ? 'Completed' : 'Not passed');
+                : (rowGrade >= 1 && rowGrade < 3 ? 'Completed' : 'Not passed');
+            gradeInput.classList.toggle('is-failing-grade', rowGrade !== undefined && rowGrade !== null && Number(rowGrade) >= 3);
             row.append(main, credit, status);
             return row;
         }));
@@ -217,7 +219,7 @@
         savingCodes.add(course.code);
         setSaveStatus('saving');
         courseGrades.set(course.code, grade);
-        if (grade >= 1 && grade <= 3) completed.add(course.code);
+        if (grade >= 1 && grade < 3) completed.add(course.code);
         else completed.delete(course.code);
         render();
 

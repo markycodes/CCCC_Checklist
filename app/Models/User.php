@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'role'])]
+#[Fillable(['name', 'email', 'password', 'role', 'program'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -22,6 +22,27 @@ class User extends Authenticatable
     public const ROLE_ADMINISTRATOR = 'administrator';
 
     public const ROLE_REGISTRAR = 'registrar';
+
+    public const PROGRAM_BPA = 'BPA';
+
+    public const PROGRAM_BSCRIM = 'BSCRIM';
+
+    public const PROGRAM_BSISM = 'BSISM';
+
+    public const PROGRAM_BSENTREP = 'BSENTREP';
+
+    public const PROGRAM_BSOA = 'BSOA';
+
+    public static function prospectusPrograms(): array
+    {
+        return [
+            self::PROGRAM_BPA,
+            self::PROGRAM_BSCRIM,
+            self::PROGRAM_BSISM,
+            self::PROGRAM_BSENTREP,
+            self::PROGRAM_BSOA,
+        ];
+    }
 
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
@@ -48,9 +69,14 @@ class User extends Authenticatable
             || $this->isProgramHead();
     }
 
+    public function canViewAllPrograms(): bool
+    {
+        return $this->isAdministrator() || $this->isRegistrar();
+    }
+
     public function canEnterGrades(): bool
     {
-        return $this->isAdministrator() || $this->isProgramHead();
+        return $this->isAdministrator() || $this->isRegistrar() || $this->isProgramHead();
     }
 
     public function students(): HasMany

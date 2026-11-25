@@ -36,7 +36,7 @@ class StudentCourseCompletionController extends Controller
         );
 
         return response()->json([
-            'completed' => $grade >= 1 && $grade <= 3,
+            'completed' => $grade >= 1 && $grade < 3,
             'grade' => number_format($grade, 2, '.', ''),
         ]);
     }

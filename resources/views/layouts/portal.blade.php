@@ -8,9 +8,9 @@
     <title>@yield('title') · CCCC Student Checklist</title>
     <link rel="stylesheet" href="{{ asset('css/student-checklist.css') }}">
     <link rel="stylesheet" href="{{ asset('css/portal.css') }}">
-    <link rel="icon" href="{{ asset('assets/img/CCCClogo.webp') }}" type="image/x-icon">
+    <link rel="icon" href="{{ asset('assets/img/cccc.png') }}" type="image/x-icon">
 </head>
-<body class="portal-body">
+<body @class(['portal-body', 'landing-loader-active' => request()->routeIs('home', 'login')])>
     <header @class(['portal-topbar', 'portal-topbar-landing' => request()->routeIs('home', 'login')])>
         @if (request()->routeIs('home', 'login'))
             <span class="portal-topbar-curve portal-topbar-curve-left" aria-hidden="true"></span>
@@ -50,6 +50,61 @@
             @endif
         </nav>
     </header>
+
+    @auth
+        @if (! request()->routeIs('home', 'login'))
+            <div class="authenticated-skeleton" role="status" aria-label="Loading page">
+                <div class="authenticated-skeleton-page">
+                    @if (request()->routeIs('admin.dashboard', 'registrar.dashboard'))
+                        <div class="skeleton-heading">
+                            <div>
+                                <span class="skeleton-line skeleton-kicker"></span>
+                                <span class="skeleton-line skeleton-title"></span>
+                                <span class="skeleton-line skeleton-subtitle"></span>
+                            </div>
+                            <span class="skeleton-block skeleton-action"></span>
+                        </div>
+                        <div class="skeleton-metrics">
+                            <span></span><span></span><span></span><span></span>
+                        </div>
+                        <div class="skeleton-dashboard-grid">
+                            <span class="skeleton-chart"></span>
+                            <span class="skeleton-chart skeleton-chart-small"></span>
+                        </div>
+                        <div class="skeleton-dashboard-grid skeleton-dashboard-grid-bottom">
+                            <span class="skeleton-table"></span>
+                            <span class="skeleton-table skeleton-table-small"></span>
+                        </div>
+                    @elseif (request()->routeIs('students.*'))
+                        <div class="skeleton-record-heading">
+                            <div>
+                                <span class="skeleton-line skeleton-kicker"></span>
+                                <span class="skeleton-line skeleton-title"></span>
+                            </div>
+                            <span class="skeleton-block skeleton-record-count"></span>
+                        </div>
+                        <div class="skeleton-record-layout">
+                            <div class="skeleton-record-list">
+                                <span></span><span></span><span></span><span></span>
+                            </div>
+                            <div class="skeleton-record-form">
+                                <span class="skeleton-line skeleton-subtitle"></span>
+                                <span></span><span></span><span></span><span></span>
+                            </div>
+                        </div>
+                    @else
+                        <div class="skeleton-heading">
+                            <span class="skeleton-line skeleton-title"></span>
+                            <span class="skeleton-block skeleton-action"></span>
+                        </div>
+                        <div class="skeleton-generic-grid">
+                            <span></span><span></span><span></span>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        @endif
+    @endauth
 
     @yield('content')
 
@@ -142,6 +197,199 @@
                 menu.classList.remove('is-open');
             }
         });
+
+        const programDeck = document.querySelector('.landing-program-deck');
+        if (programDeck) {
+            const deckCards = [...programDeck.querySelectorAll('.landing-program-card')];
+            let swipe = null;
+            let suppressDeckClick = false;
+
+            const bringCardToFront = (selectedCard) => {
+                const selectedIndex = deckCards.indexOf(selectedCard);
+                deckCards.forEach((card, index) => {
+                    let position = index - selectedIndex;
+                    if (position < -2) position += deckCards.length;
+                    if (position > 2) position -= deckCards.length;
+
+                    card.dataset.deckPosition = String(position);
+                    card.classList.toggle('is-front', index === selectedIndex);
+                    card.setAttribute('aria-pressed', String(index === selectedIndex));
+                });
+            };
+
+            deckCards.forEach((card) => {
+                card.addEventListener('click', () => {
+                    if (!suppressDeckClick) bringCardToFront(card);
+                    suppressDeckClick = false;
+                });
+                card.addEventListener('keydown', (event) => {
+                    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+                    event.preventDefault();
+                    const currentIndex = deckCards.indexOf(card);
+                    const step = event.key === 'ArrowRight' ? 1 : -1;
+                    const nextIndex = (currentIndex + step + deckCards.length) % deckCards.length;
+                    deckCards[nextIndex].focus();
+                    bringCardToFront(deckCards[nextIndex]);
+                });
+
+                card.addEventListener('pointerdown', (event) => {
+                    if (event.pointerType === 'mouse' && event.button !== 0) return;
+                    if (!card.classList.contains('is-front')) {
+                        bringCardToFront(card);
+                    }
+                    swipe = {
+                        card,
+                        pointerId: event.pointerId,
+                        startX: event.clientX,
+                        startY: event.clientY,
+                        dx: 0,
+                        dy: 0,
+                    };
+                    card.classList.add('is-dragging');
+                    card.setPointerCapture?.(event.pointerId);
+                });
+
+                card.addEventListener('pointermove', (event) => {
+                    if (!swipe || swipe.pointerId !== event.pointerId || swipe.card !== card) return;
+                    swipe.dx = event.clientX - swipe.startX;
+                    swipe.dy = event.clientY - swipe.startY;
+
+                    if (Math.abs(swipe.dx) < 8 && Math.abs(swipe.dy) < 8) return;
+                    const directionX = swipe.dx;
+                    const directionY = swipe.dy;
+                    card.style.setProperty('--deck-x', `${directionX * .65}px`);
+                    card.style.setProperty('--deck-y', `${directionY * .35}px`);
+                    card.style.setProperty('--deck-rotate', `${directionX * .035}deg`);
+                    card.style.setProperty('--deck-scale', '.96');
+                    card.style.opacity = String(Math.max(.68, 1 - Math.abs(directionX) / 500));
+                });
+
+                const finishSwipe = (event) => {
+                    if (!swipe || swipe.pointerId !== event.pointerId || swipe.card !== card) return;
+                    card.releasePointerCapture?.(event.pointerId);
+
+                    const { dx, dy } = swipe;
+                    swipe = null;
+                    card.style.removeProperty('--deck-x');
+                    card.style.removeProperty('--deck-y');
+                    card.style.removeProperty('--deck-rotate');
+                    card.style.removeProperty('--deck-scale');
+                    card.style.opacity = '';
+                    card.classList.remove('is-dragging');
+
+                    const isSwipe = Math.max(Math.abs(dx), Math.abs(dy)) >= 48;
+                    if (!isSwipe) return;
+
+                    suppressDeckClick = true;
+                    const currentIndex = deckCards.indexOf(card);
+                    const horizontal = Math.abs(dx) >= Math.abs(dy);
+                    const direction = horizontal
+                        ? (dx < 0 ? -1 : 1)
+                        : (dy < 0 ? -1 : 1);
+
+                    card.classList.add(direction < 0 ? 'is-swiping-left' : 'is-swiping-right');
+                    window.setTimeout(() => {
+                        card.classList.remove('is-swiping-left', 'is-swiping-right');
+                        const nextIndex = (currentIndex + direction + deckCards.length) % deckCards.length;
+                        bringCardToFront(deckCards[nextIndex]);
+                    }, 320);
+                };
+
+                card.addEventListener('pointerup', finishSwipe);
+                card.addEventListener('pointercancel', finishSwipe);
+            });
+        }
+
+        const authenticatedSkeleton = document.querySelector('.authenticated-skeleton');
+        if (authenticatedSkeleton) {
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+            const exitAuthenticatedSkeleton = () => {
+                authenticatedSkeleton.classList.add('is-exiting');
+                window.setTimeout(() => authenticatedSkeleton.remove(), reduceMotion.matches ? 20 : 420);
+            };
+
+            if (document.readyState === 'complete') {
+                window.setTimeout(exitAuthenticatedSkeleton, reduceMotion.matches ? 20 : 620);
+            } else {
+                window.addEventListener('load', () => {
+                    window.setTimeout(exitAuthenticatedSkeleton, reduceMotion.matches ? 20 : 620);
+                }, { once: true });
+            }
+        }
+
+        const landingLoader = document.querySelector('.landing-loader');
+        if (landingLoader) {
+            const loaderLogo = landingLoader.querySelector('.landing-loader-logo');
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+            const finishLandingLoader = () => {
+                const headerLogo = document.querySelector('.portal-topbar-landing .college-logo');
+                if (headerLogo && loaderLogo) {
+                    const loaderRect = loaderLogo.getBoundingClientRect();
+                    const headerRect = headerLogo.getBoundingClientRect();
+                    const deltaX = (headerRect.left + headerRect.width / 2) - (loaderRect.left + loaderRect.width / 2);
+                    const deltaY = (headerRect.top + headerRect.height / 2) - (loaderRect.top + loaderRect.height / 2);
+
+                    landingLoader.style.setProperty('--loader-x', `${deltaX}px`);
+                    landingLoader.style.setProperty('--loader-y', `${deltaY}px`);
+                }
+
+                landingLoader.classList.add('is-exiting');
+                window.setTimeout(() => {
+                    document.body.classList.remove('landing-loader-active');
+                    landingLoader.remove();
+                }, reduceMotion.matches ? 20 : 2300);
+            };
+
+            const startLandingLoader = () => {
+                window.setTimeout(finishLandingLoader, reduceMotion.matches ? 120 : 4500);
+            };
+
+            if (document.readyState === 'complete') {
+                startLandingLoader();
+            } else {
+                window.addEventListener('load', startLandingLoader, { once: true });
+            }
+        }
+
+        const scrollRevealShell = document.querySelector('.scroll-reveal-shell');
+        if (scrollRevealShell) {
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+            let revealFrame = 0;
+
+            if (window.scrollY > 0) {
+                scrollRevealShell.classList.remove('is-scroll-reveal-pending');
+            }
+
+            const updateScrollReveal = () => {
+                revealFrame = 0;
+                if (reduceMotion.matches) return;
+
+                const rect = scrollRevealShell.getBoundingClientRect();
+                const range = Math.max(scrollRevealShell.offsetHeight - window.innerHeight * .45, 1);
+                const progress = Math.min(1, Math.max(0, (window.innerHeight * .82 - rect.top) / range));
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const isMobile = window.innerWidth <= 760;
+
+                scrollRevealShell.style.setProperty('--reveal-frame-y', `${80 * (1 - eased)}px`);
+                scrollRevealShell.style.setProperty('--reveal-frame-scale', isMobile ? (.82 + .18 * eased).toFixed(3) : (.78 + .22 * eased).toFixed(3));
+                scrollRevealShell.style.setProperty('--reveal-frame-saturate', (.78 + .22 * eased).toFixed(3));
+                scrollRevealShell.style.setProperty('--reveal-heading-y', `${-34 * eased}px`);
+                scrollRevealShell.style.setProperty('--reveal-heading-opacity', (.45 + .55 * eased).toFixed(3));
+            };
+
+            const requestRevealUpdate = () => {
+                if (window.scrollY > 0) {
+                    scrollRevealShell.classList.remove('is-scroll-reveal-pending');
+                }
+
+                if (!revealFrame) revealFrame = window.requestAnimationFrame(updateScrollReveal);
+            };
+
+            window.addEventListener('scroll', requestRevealUpdate, { passive: true });
+            window.addEventListener('resize', requestRevealUpdate);
+            updateScrollReveal();
+        }
 
         const courseScrollShell = document.querySelector('.course-scroll-shell');
         if (courseScrollShell) {

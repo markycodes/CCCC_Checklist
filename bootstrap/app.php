@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureAdministrator;
+use App\Http\Middleware\EnsureHttps;
 use App\Http\Middleware\EnsureProgramHead;
 use App\Http\Middleware\EnsureRegistrar;
 use Illuminate\Foundation\Application;
@@ -15,6 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->prependToGroup('web', EnsureHttps::class);
+
         $middleware->alias([
             'program-head' => EnsureProgramHead::class,
             'administrator' => EnsureAdministrator::class,

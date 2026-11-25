@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -51,14 +52,23 @@ class ProgramHeadLoginController extends Controller
                 'cf-turnstile-response.required' => 'Please complete the Cloudflare verification.',
             ]);
 
-            $verification = Http::asForm()->post(
-                'https://challenges.cloudflare.com/turnstile/v0/siteverify',
-                [
-                    'secret' => config('cloudflare-turnstile.secret_key'),
-                    'response' => $request->input('cf-turnstile-response'),
-                    'remoteip' => $request->ip(),
-                ],
-            );
+            try {
+                $verification = Http::asForm()
+                    ->connectTimeout(5)
+                    ->timeout(10)
+                    ->post(
+                        'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+                        [
+                            'secret' => config('cloudflare-turnstile.secret_key'),
+                            'response' => $request->input('cf-turnstile-response'),
+                            'remoteip' => $request->ip(),
+                        ],
+                    );
+            } catch (ConnectionException) {
+                throw ValidationException::withMessages([
+                    'cf-turnstile-response' => 'Cloudflare verification is temporarily unavailable. Please try again.',
+                ]);
+            }
 
             if (! $verification->successful() || ! ($verification->json('success') ?? false)) {
                 throw ValidationException::withMessages([

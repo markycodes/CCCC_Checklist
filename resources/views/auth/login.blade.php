@@ -4,6 +4,10 @@
 @section('description', 'Sign in to the Catbalogan City Community College student course checklist.')
 
 @section('content')
+    <div class="landing-loader" role="status" aria-label="Loading Catbalogan City Community College sign-in page">
+        <div class="landing-loader-progress" aria-hidden="true"><span></span></div>
+        <img class="landing-loader-logo" src="{{ asset('assets/img/CCCClogo.webp') }}" alt="CCCC seal">
+    </div>
     <main class="login-page login-backdrop-page">
         <section class="login-intro ">
             <p class="portal-kicker"><span></span> STUDENT COURSE CHECKLIST</p>

@@ -23,7 +23,26 @@ class ProgramHeadLoginControllerTest extends TestCase
             ->assertOk()
             ->assertSee('portal-topbar-landing', false)
             ->assertSee('Every course.')
-            ->assertSee('BACHELOR OF PUBLIC ADMINISTRATION');
+            ->assertSee('landing-program-deck', false)
+            ->assertSee('BSCRIM')
+            ->assertSee('BSISM')
+            ->assertSee('BPA')
+            ->assertSee('BSENTREP')
+            ->assertSee('BSOA')
+            ->assertSee('criminal justice')
+            ->assertSee('scroll-reveal-shell is-scroll-reveal-pending', false)
+            ->assertSee('THE STUDENT CHECKLIST PROCESS')
+            ->assertSee('Program-based access')
+            ->assertSee('Program Head')
+            ->assertSee('Administrators and Registrars')
+            ->assertSee('From prospectus to progress')
+            ->assertSee('CHECKLIST SYSTEM')
+            ->assertSee('Enroll')
+            ->assertSee('Match program')
+            ->assertSee('Track progress')
+            ->assertSee('PROGRAM PROSPECTUS')
+            ->assertDontSee('Student dashboard')
+            ->assertDontSee('CURRICULUM BY YEAR');
     }
 
     public function test_program_head_login_page_is_available(): void

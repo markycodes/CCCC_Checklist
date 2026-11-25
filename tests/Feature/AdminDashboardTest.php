@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class AdminDashboardTest extends TestCase
@@ -42,6 +43,7 @@ class AdminDashboardTest extends TestCase
                 'email' => 'head@cccc.edu.ph',
                 'password' => 'StrongPassword123!',
                 'password_confirmation' => 'StrongPassword123!',
+                'program' => 'BPA',
             ])
             ->assertRedirect(route('admin.dashboard'))
             ->assertSessionHas('status', 'Program Head account created.');
@@ -49,7 +51,59 @@ class AdminDashboardTest extends TestCase
         $this->assertDatabaseHas('users', [
             'email' => 'head@cccc.edu.ph',
             'role' => User::ROLE_PROGRAM_HEAD,
+            'program' => 'BPA',
         ]);
+    }
+
+    #[DataProvider('programProvider')]
+    public function test_administrator_can_provision_each_supported_program(string $program): void
+    {
+        $administrator = User::factory()->administrator()->create();
+        $email = strtolower($program).'@cccc.edu.ph';
+
+        $this->actingAs($administrator)
+            ->post(route('admin.program-heads.store'), [
+                'name' => "{$program} Program Head",
+                'email' => $email,
+                'password' => 'StrongPassword123!',
+                'password_confirmation' => 'StrongPassword123!',
+                'program' => $program,
+            ])
+            ->assertRedirect(route('admin.dashboard'));
+
+        $this->assertDatabaseHas('users', [
+            'email' => $email,
+            'role' => User::ROLE_PROGRAM_HEAD,
+            'program' => $program,
+        ]);
+    }
+
+    public static function programProvider(): array
+    {
+        return [
+            'BPA' => ['BPA'],
+            'BSCRIM' => ['BSCRIM'],
+            'BSISM' => ['BSISM'],
+            'BSENTREP' => ['BSENTREP'],
+            'BSOA' => ['BSOA'],
+        ];
+    }
+
+    public function test_administrator_cannot_provision_an_unknown_program(): void
+    {
+        $administrator = User::factory()->administrator()->create();
+
+        $this->actingAs($administrator)
+            ->post(route('admin.program-heads.store'), [
+                'name' => 'Unknown Program Head',
+                'email' => 'unknown@cccc.edu.ph',
+                'password' => 'StrongPassword123!',
+                'password_confirmation' => 'StrongPassword123!',
+                'program' => 'UNKNOWN',
+            ])
+            ->assertInvalid(['program']);
+
+        $this->assertDatabaseMissing('users', ['email' => 'unknown@cccc.edu.ph']);
     }
 
     public function test_administrator_can_view_all_students(): void

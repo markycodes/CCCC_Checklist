@@ -15,7 +15,7 @@ class StudentController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = $request->user()->isAdministrator() || $request->user()->isRegistrar()
+        $query = $request->user()->canViewAllPrograms()
             ? Student::query()
             : $request->user()->students();
 
@@ -54,7 +54,7 @@ class StudentController extends Controller
             'students' => $students,
             'schoolYearOptions' => $schoolYearOptions,
             'totalCourses' => config('bpa_curriculum.total_courses'),
-            'programHeads' => $request->user()->isAdministrator() || $request->user()->isRegistrar()
+            'programHeads' => $request->user()->canViewAllPrograms()
                 ? User::query()->where('role', User::ROLE_PROGRAM_HEAD)->orderBy('name')->get()
                 : collect(),
         ]);
@@ -63,7 +63,7 @@ class StudentController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $owner = $request->user();
-        if ($owner->isRegistrar() || $owner->isAdministrator()) {
+        if ($owner->canViewAllPrograms()) {
             $validatedOwner = $request->validate([
                 'program_head_id' => ['required', 'integer', 'exists:users,id'],
             ]);
@@ -86,7 +86,7 @@ class StudentController extends Controller
     {
         $this->authorize('view', $student);
         $student->load('completedCourses');
-        $studentQuery = auth()->user()->isAdministrator() || auth()->user()->isRegistrar()
+        $studentQuery = auth()->user()->canViewAllPrograms()
             ? Student::query()
             : auth()->user()->students();
         $studentList = $studentQuery

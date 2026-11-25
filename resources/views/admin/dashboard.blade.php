@@ -123,7 +123,7 @@
                     <div>
                         <span>{{ \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($programHead->name, 0, 1)) }}</span>
                         <p><strong>{{ $programHead->name }}</strong><small>{{ $programHead->email }}</small></p>
-                        <b>{{ $programHead->students_count }}</b>
+                        <b title="Prospectus template">{{ $programHead->program }}</b>
                     </div>
                 @endforeach
             </div>
@@ -168,6 +168,15 @@
             <label for="head-email">Email address</label>
             <input id="head-email" name="email" type="email" value="{{ old('email') }}" required maxlength="255" autocomplete="email" @if($errors->has('email')) aria-invalid="true" aria-describedby="head-email-error" @endif>
             @error('email')<p id="head-email-error" class="field-error">{{ $message }}</p>@enderror
+            <label for="head-program">Prospectus program</label>
+            <select id="head-program" name="program" required>
+                <option value="BPA" @selected(old('program', 'BPA') === 'BPA')>BPA — Bachelor of Public Administration</option>
+                <option value="BSCRIM" @selected(old('program') === 'BSCRIM')>BSCRIM — Bachelor of Science in Criminology</option>
+                <option value="BSISM" @selected(old('program') === 'BSISM')>BSISM — Bachelor of Science in Information Systems Management</option>
+                <option value="BSENTREP" @selected(old('program') === 'BSENTREP')>BSENTREP — Bachelor of Science in Entrepreneurship</option>
+                <option value="BSOA" @selected(old('program') === 'BSOA')>BSOA — Bachelor of Science in Office Administration</option>
+            </select>
+            @error('program')<p id="head-program-error" class="field-error">{{ $message }}</p>@enderror
             <label for="head-password">Temporary password</label>
             <input id="head-password" name="password" type="password" required minlength="12" autocomplete="new-password" @if($errors->has('password')) aria-invalid="true" aria-describedby="head-password-error" @endif>
             @error('password')<p id="head-password-error" class="field-error">{{ $message }}</p>@enderror

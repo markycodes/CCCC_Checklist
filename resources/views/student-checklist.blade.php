@@ -11,7 +11,7 @@
     <title>{{ $student->name }} · Student Course Checklist</title>
     <link rel="stylesheet" href="{{ asset('css/student-checklist.css') }}">
     <link rel="stylesheet" href="{{ asset('css/portal.css') }}">
-    <link rel="icon" href="{{ asset('assets/img/CCCClogo.webp') }}" type="image/x-icon">
+    <link rel="icon" href="{{ asset('assets/img/cccc.png') }}" type="image/x-icon">
     <script>
         window.bpaCurriculum = @js($curriculum);
         window.completedCourseGrades = @js($completedCourseGrades);
@@ -218,7 +218,7 @@
                     <div id="year-tabs" class="year-tabs" role="tablist" aria-label="Academic year"></div>
                     <div class="rail-note">
                         <span class="rail-note-icon" aria-hidden="true">i</span>
-                        <p>Use 0.00 for no grade. Grades 1.00–3.00 are passed; 3.01–5.00 are not passed.</p>
+                        <p>Use 0.00 for no grade. Grades 1.00–2.99 are passed; 3.00–5.00 are not passed and shown in red.</p>
                     </div>
                 </aside>
 

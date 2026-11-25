@@ -16,6 +16,7 @@ class ProgramHeadAccountProvisioningTest extends TestCase
         $this->artisan('program-head:create')
             ->expectsQuestion('Program Head full name', 'Patricia Reyes')
             ->expectsQuestion('College email address', 'PReyes@CCCC.edu.ph')
+            ->expectsQuestion('Prospectus program identifier', 'BPA')
             ->expectsQuestion('Temporary password (at least 12 characters)', 'CampusAccess2026!')
             ->expectsQuestion('Confirm temporary password', 'CampusAccess2026!')
             ->expectsOutputToContain('Program Head account created for preyes@cccc.edu.ph.')
@@ -24,6 +25,7 @@ class ProgramHeadAccountProvisioningTest extends TestCase
         $programHead = User::query()->where('email', 'preyes@cccc.edu.ph')->firstOrFail();
 
         $this->assertSame(User::ROLE_PROGRAM_HEAD, $programHead->role);
+        $this->assertSame('BPA', $programHead->program);
         $this->assertTrue(Hash::check('CampusAccess2026!', $programHead->password));
     }
 
@@ -32,6 +34,7 @@ class ProgramHeadAccountProvisioningTest extends TestCase
         $this->artisan('program-head:create')
             ->expectsQuestion('Program Head full name', 'Patricia Reyes')
             ->expectsQuestion('College email address', 'preyes@cccc.edu.ph')
+            ->expectsQuestion('Prospectus program identifier', 'BPA')
             ->expectsQuestion('Temporary password (at least 12 characters)', 'short')
             ->expectsOutputToContain('The password must contain at least 12 characters.')
             ->assertExitCode(1);

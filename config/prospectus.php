@@ -6,6 +6,7 @@
  | Course row = [code, title, lecture hrs, lab hrs, credit units, pre/co-requisite]
  */
 return [
+    'templates' => ['BPA', 'BSCRIM', 'BSISM', 'BSENTREP', 'BSOA'],
     'filename' => 'BPA-Prospectus-Students-Copy.pdf',
     'paper' => [0, 0, 612, 936],   // 8.5in x 13in (long bond) in points
     'copy_label' => 'STUDENT’S COPY',
