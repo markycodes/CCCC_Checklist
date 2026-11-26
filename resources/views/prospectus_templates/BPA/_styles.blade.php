@@ -46,7 +46,7 @@ body { font-family: {!! $cfg['font_family'] !!}; font-size: 10pt; line-height: {
 .evaluation-row td { font-size: {{ $f['eval'] }}pt; padding: 3pt 0 0; vertical-align: bottom; white-space: nowrap; }
 .evaluation-row .eval-line { display: block; width: 95pt; height: 9pt; border-bottom-color: #000; }
 
-table.hdr { width: 100%; border-collapse: collapse; table-layout: fixed; }
+table.hdr { width: 100%; margin-top: 12pt; border-collapse: collapse; table-layout: fixed; }
 .hdr td { vertical-align: top; padding: 0; }
 .hdr td.hdr-l { width: 25%; padding-top: 38pt; padding-right: 6pt; color: #1f3a7a; font-family: 'Tahoma', sans-serif; }
 .hdr td.hdr-c { width: 50%; text-align: center; }

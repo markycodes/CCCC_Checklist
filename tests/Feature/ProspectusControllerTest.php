@@ -39,6 +39,12 @@ class ProspectusControllerTest extends TestCase
             ->get(route('students.show', $student))
             ->assertOk()
             ->assertSee('Preview Prospectus')
+            ->assertSee('id="prospectus-template"', false)
+            ->assertSee('<option value="BPA"', false)
+            ->assertSee('<option value="BSOA"', false)
+            ->assertSee('<option value="BSCRIM"', false)
+            ->assertSee('<option value="BSENTREP"', false)
+            ->assertSee('<option value="BSISM"', false)
             ->assertSee('id="prospectus-modal"', false)
             ->assertDontSee('prospectus-modal-download', false)
             ->assertDontSee('print-prospectus-modal', false)
@@ -70,6 +76,265 @@ class ProspectusControllerTest extends TestCase
         $this->assertSame(3, substr_count($preview->getContent(), 'class="student-field-value'));
         $preview->assertSee('class="student-field-value student-name"', false);
         $preview->assertSee('class="line" style="width:100%"', false);
+    }
+
+    public function test_bscrim_student_renders_the_bscrim_prospectus_template(): void
+    {
+        $programHead = User::factory()->programHead()->create(['program' => 'BSCRIM']);
+        $registrar = User::factory()->registrar()->create();
+        $student = $programHead->students()->create([
+            'student_id' => 'CCCC-BSCRIM-001',
+            'name' => 'BSCRIM Prospectus Student',
+            'entry_year' => 2024,
+            'expected_graduation_year' => 2028,
+        ]);
+
+        $this->actingAs($registrar)
+            ->get(route('students.prospectus.show', [$student, 'modal' => 1]))
+            ->assertOk()
+            ->assertSee('Bachelor of Science in Criminology (BS Criminology)')
+            ->assertSee('FIRST YEAR')
+            ->assertSee('FOURTH YEAR')
+            ->assertSee('PE DefTac 2204')
+            ->assertSee('CBA 3201')
+            ->assertSee('(3)')
+            ->assertSee('540 Hours')
+            ->assertSee(
+                '<tr class="t-row"><td><span class="chk"></span>CRM 2203</td><td>Human Behavior and Victimology</td><td>3</td><td>0</td><td>3</td><td>CRM 2102</td></tr>',
+                false,
+            )
+            ->assertSee(
+                '<tr class="t-total"><td colspan="2" class="lbl">Total Units</td><td>6</td><td>0</td><td>6</td><td></td></tr>',
+                false,
+            )
+            ->assertSee('Grand Total');
+    }
+
+    public function test_bscrim_prospectus_keeps_second_year_second_semester_on_page_one(): void
+    {
+        $programHead = User::factory()->programHead()->create(['program' => 'BSCRIM']);
+        $registrar = User::factory()->registrar()->create();
+        $student = $programHead->students()->create([
+            'student_id' => 'CCCC-BSCRIM-PAGES',
+            'name' => 'BSCRIM Page Layout Student',
+            'entry_year' => 2024,
+        ]);
+
+        $pdf = $this->actingAs($registrar)
+            ->get(route('students.prospectus.stream', $student))
+            ->assertOk()
+            ->assertHeader('content-type', 'application/pdf')
+            ->getContent();
+
+        preg_match_all('/\/Type\s*\/Page\b/', $pdf, $pages);
+
+        $this->assertSame(2, count($pages[0]));
+    }
+
+    public function test_bsentrep_template_renders_reference_rows_and_track_totals(): void
+    {
+        $programHead = User::factory()->programHead()->create(['program' => 'BPA']);
+        $registrar = User::factory()->registrar()->create();
+        $student = $programHead->students()->create([
+            'student_id' => 'CCCC-BSENTREP-001',
+            'name' => 'BSENTREP Prospectus Student',
+            'entry_year' => 2024,
+        ]);
+
+        $this->actingAs($registrar)
+            ->get(route('students.prospectus.show', [$student, 'modal' => 1, 'template' => 'BSENTREP']))
+            ->assertOk()
+            ->assertSee('Bachelor of Science in Entrepreneurship (BSENTREP)')
+            ->assertSee('Special Track in Tourism and Hospitality Business')
+            ->assertSee('DEAN’S COPY')
+            ->assertSee('ABM 1001')
+            ->assertSee(
+                '<td>Business Mathematics<br><span class="track-label">(For Non-ABM track)</span></td>',
+                false,
+            )
+            ->assertSee(
+                '<tr class="t-row"><td><span class="chk"></span>ABM 1003</td><td>Fundamentals of Accounting 2<br><span class="track-label">(For Non-ABM track)</span></td><td>3</td><td>0</td><td>3</td><td>ABM 1002</td></tr>',
+                false,
+            )
+            ->assertSee('PATHFit 1101,1202,1203')
+            ->assertSee(
+                '<tr class="t-total"><td colspan="2" class="lbl">Total Units <span class="track-label">(For NON-ABM track)</span></td><td>26</td><td>0</td><td>20</td><td></td></tr>',
+                false,
+            )
+            ->assertSee('GRAND TOTAL (For NON-ABM Track)')
+            ->assertSee('<u>138 Units</u>', false)
+            ->assertSee('150 units')
+            ->assertSee('GRAND TOTAL (For NON-ABM Track)');
+    }
+
+    public function test_bsentrep_prospectus_renders_as_two_pages(): void
+    {
+        $programHead = User::factory()->programHead()->create(['program' => 'BPA']);
+        $registrar = User::factory()->registrar()->create();
+        $student = $programHead->students()->create([
+            'student_id' => 'CCCC-BSENTREP-PAGES',
+            'name' => 'BSENTREP Page Layout Student',
+            'entry_year' => 2024,
+        ]);
+
+        $pdf = $this->actingAs($registrar)
+            ->get(route('students.prospectus.stream', [$student, 'template' => 'BSENTREP']))
+            ->assertOk()
+            ->assertHeader('content-type', 'application/pdf')
+            ->getContent();
+
+        preg_match_all('/\/Type\s*\/Page\b/', $pdf, $pages);
+
+        $this->assertSame(2, count($pages[0]));
+    }
+
+    public function test_bsoa_template_renders_reference_rows_and_underlined_grand_total(): void
+    {
+        $programHead = User::factory()->programHead()->create(['program' => 'BPA']);
+        $registrar = User::factory()->registrar()->create();
+        $student = $programHead->students()->create([
+            'student_id' => 'CCCC-BSOA-001',
+            'name' => 'BSOA Prospectus Student',
+            'entry_year' => 2024,
+        ]);
+
+        $this->actingAs($registrar)
+            ->get(route('students.prospectus.show', [$student, 'modal' => 1, 'template' => 'BSOA']))
+            ->assertOk()
+            ->assertSee('Bachelor of Science in Office Administration (BSOA)')
+            ->assertSee('STUDENT’S COPY')
+            ->assertSee(
+                '<tr class="t-colhead"><th style="width:18%">Course Code</th><th style="width:40%">Course Title</th><th style="width:8%">Lecture<br><span class="reg">(Hours)</span></th><th style="width:8%">Lab<br><span class="reg">(Hours)</span></th><th style="width:8%">Credit<br><span class="reg">(Units)</span></th><th style="width:18%">Pre-requisite<br><span class="reg">Co-requisite</span></th></tr>',
+                false,
+            )
+            ->assertSee(
+                '<tr class="t-row"><td><span class="chk"></span>ABM 1003</td><td>Fundamentals of Accounting 2<br><span class="track-label">(For Non-ABM track)</span></td><td>3</td><td>0</td><td>3</td><td>ABM 1002</td></tr>',
+                false,
+            )
+            ->assertSee(
+                '<tr class="t-total"><td colspan="2" class="lbl">Total Units <span class="track-label">(For NON-ABM track)</span></td><td>26</td><td>0</td><td>20</td><td></td></tr>',
+                false,
+            )
+            ->assertSee('<u>128 Units</u>', false)
+            ->assertSee('140 units');
+    }
+
+    public function test_bsoa_prospectus_renders_as_two_pages(): void
+    {
+        $programHead = User::factory()->programHead()->create(['program' => 'BPA']);
+        $registrar = User::factory()->registrar()->create();
+        $student = $programHead->students()->create([
+            'student_id' => 'CCCC-BSOA-PAGES',
+            'name' => 'BSOA Page Layout Student',
+            'entry_year' => 2024,
+        ]);
+
+        $pdf = $this->actingAs($registrar)
+            ->get(route('students.prospectus.stream', [$student, 'template' => 'BSOA']))
+            ->assertOk()
+            ->assertHeader('content-type', 'application/pdf')
+            ->getContent();
+
+        preg_match_all('/\/Type\s*\/Page\b/', $pdf, $pages);
+
+        $this->assertSame(2, count($pages[0]));
+    }
+
+    public function test_bsism_template_renders_reference_rows_and_underlined_grand_total(): void
+    {
+        $programHead = User::factory()->programHead()->create(['program' => 'BPA']);
+        $registrar = User::factory()->registrar()->create();
+        $student = $programHead->students()->create([
+            'student_id' => 'CCCC-BSISM-001',
+            'name' => 'BSISM Prospectus Student',
+            'entry_year' => 2024,
+        ]);
+
+        $this->actingAs($registrar)
+            ->get(route('students.prospectus.show', [$student, 'modal' => 1, 'template' => 'BSISM']))
+            ->assertOk()
+            ->assertSee('Bachelor of Science in Industrial Security Management (BSISM)')
+            ->assertSee('DEAN’S COPY')
+            ->assertSee(
+                '<tr class="t-row"><td><span class="chk"></span>PE DEFTACT 2103</td><td>First Aid and Water Safety w/ Disaster Risk Reduction Management (DRRM)</td><td>2</td><td>0</td><td>2</td><td>PE DefTac 1201</td></tr>',
+                false,
+            )
+            ->assertSee(
+                '<tr class="t-row"><td><span class="chk"></span>ISP 4202</td><td>Practicum 1 (Private Institutions)</td><td>6</td><td>540 Hours</td><td>6</td><td>Junior Standing</td></tr>',
+                false,
+            )
+            ->assertSee(
+                '<tr class="t-total"><td colspan="2" class="lbl">Total Units</td><td>6</td><td>540</td><td>6</td><td></td></tr>',
+                false,
+            )
+            ->assertSee('<u>178 units</u>', false)
+            ->assertSee('MAJOR COURSES')
+            ->assertSee('CLJ4206');
+    }
+
+    public function test_bsism_prospectus_renders_as_two_pages(): void
+    {
+        $programHead = User::factory()->programHead()->create(['program' => 'BPA']);
+        $registrar = User::factory()->registrar()->create();
+        $student = $programHead->students()->create([
+            'student_id' => 'CCCC-BSISM-PAGES',
+            'name' => 'BSISM Page Layout Student',
+            'entry_year' => 2024,
+        ]);
+
+        $pdf = $this->actingAs($registrar)
+            ->get(route('students.prospectus.stream', [$student, 'template' => 'BSISM']))
+            ->assertOk()
+            ->assertHeader('content-type', 'application/pdf')
+            ->assertHeader('content-disposition', 'inline; filename=BSISM-Prospectus-Deans-Copy.pdf')
+            ->getContent();
+
+        preg_match_all('/\/Type\s*\/Page\b/', $pdf, $pages);
+
+        $this->assertSame(2, count($pages[0]));
+    }
+
+    public function test_registrar_can_select_a_different_prospectus_template_for_testing(): void
+    {
+        $programHead = User::factory()->programHead()->create(['program' => 'BPA']);
+        $registrar = User::factory()->registrar()->create();
+        $student = $programHead->students()->create([
+            'student_id' => 'CCCC-TEMPLATE-TEST',
+            'name' => 'Template Test Student',
+            'entry_year' => 2024,
+        ]);
+
+        $this->actingAs($registrar)
+            ->get(route('students.prospectus.show', [$student, 'modal' => 1, 'template' => 'BSCRIM']))
+            ->assertOk()
+            ->assertSee('Bachelor of Science in Criminology (BS Criminology)')
+            ->assertSee('CRM 1101');
+
+        $streamedPreview = $this->get(route('students.prospectus.stream', [$student, 'template' => 'BSCRIM']))
+            ->assertOk()
+            ->assertHeader('content-type', 'application/pdf');
+
+        $this->assertStringContainsString(
+            'BSCRIM-Prospectus-Students-Copy.pdf',
+            $streamedPreview->headers->get('content-disposition'),
+        );
+    }
+
+    public function test_registrar_cannot_select_an_unregistered_prospectus_template(): void
+    {
+        $programHead = User::factory()->programHead()->create(['program' => 'BPA']);
+        $registrar = User::factory()->registrar()->create();
+        $student = $programHead->students()->create([
+            'student_id' => 'CCCC-TEMPLATE-INVALID',
+            'name' => 'Invalid Template Student',
+            'entry_year' => 2024,
+        ]);
+
+        $this->actingAs($registrar)
+            ->from(route('students.show', $student))
+            ->get(route('students.prospectus.show', [$student, 'template' => 'UNREGISTERED']))
+            ->assertRedirect(route('students.show', $student))
+            ->assertSessionHasErrors('template');
     }
 
     public function test_only_registrars_can_access_the_prospectus(): void

@@ -8,13 +8,14 @@ use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class ProspectusController extends Controller
 {
     /** Browser preview (printable). */
     public function show(Request $request, ?Student $student = null)
     {
-        $data = $this->data(false, $student);
+        $data = $this->data(false, $student, $this->selectedTemplate($request));
 
         return view($data['template']['view'].'.preview', $data + [
             'autoprint' => $request->boolean('print'),
@@ -22,17 +23,17 @@ class ProspectusController extends Controller
     }
 
     /** Download as PDF. */
-    public function download(?Student $student = null)
+    public function download(Request $request, ?Student $student = null)
     {
-        $data = $this->data(true, $student);
+        $data = $this->data(true, $student, $this->selectedTemplate($request));
 
         return $this->pdf($student, $data)->download($data['cfg']['filename']);
     }
 
     /** Open the PDF in the browser tab. */
-    public function stream(?Student $student = null)
+    public function stream(Request $request, ?Student $student = null)
     {
-        $data = $this->data(true, $student);
+        $data = $this->data(true, $student, $this->selectedTemplate($request));
 
         return $this->pdf($student, $data)->stream($data['cfg']['filename']);
     }
@@ -45,7 +46,7 @@ class ProspectusController extends Controller
             ->setPaper($data['cfg']['paper'], 'portrait');
     }
 
-    private function data(bool $forPdf, ?Student $student = null): array
+    private function data(bool $forPdf, ?Student $student = null, ?string $selectedTemplate = null): array
     {
         $program = User::PROGRAM_BPA;
         if ($student?->programHead) {
@@ -55,6 +56,7 @@ class ProspectusController extends Controller
         }
 
         $templates = config('prospectus.templates', []);
+        $program = $selectedTemplate ?? $program;
         if (! array_key_exists($program, $templates)) {
             $program = User::PROGRAM_BPA;
         }
@@ -113,5 +115,15 @@ class ProspectusController extends Controller
             'student' => $student,
             'template' => $template,
         ];
+    }
+
+    private function selectedTemplate(Request $request): ?string
+    {
+        $templates = config('prospectus.templates', []);
+        $validated = $request->validate([
+            'template' => ['sometimes', 'required', 'string', Rule::in(array_keys($templates))],
+        ]);
+
+        return $validated['template'] ?? null;
     }
 }

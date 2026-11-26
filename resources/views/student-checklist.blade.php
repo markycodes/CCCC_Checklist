@@ -182,6 +182,16 @@
                 </div>
                 <div class="curriculum-actions">
                     @if (auth()->user()->isRegistrar())
+                        <label class="prospectus-template-picker" for="prospectus-template">
+                            <span>Template <small>Testing</small></span>
+                            <select id="prospectus-template" aria-label="Select prospectus template for testing">
+                                @foreach (config('prospectus.templates', []) as $program => $template)
+                                    <option value="{{ $program }}" @selected($student->programHead?->program === $program)>
+                                        {{ $program }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </label>
                         <button class="primary-link" type="button" id="open-prospectus-modal" aria-haspopup="dialog"
                             aria-controls="prospectus-modal">
                             Preview Prospectus <span aria-hidden="true">↗</span>
@@ -202,13 +212,13 @@
             </div>
 
             @if (auth()->user()->isRegistrar())
-                <dialog class="prospectus-modal" id="prospectus-modal" aria-label="BPA Prospectus preview">
+                <dialog class="prospectus-modal" id="prospectus-modal" aria-label="Prospectus preview">
                     <header class="prospectus-modal-header">
                         <button class="prospectus-modal-close" type="button" id="close-prospectus-modal"
                             aria-label="Close prospectus preview">×</button>
                     </header>
-                    <iframe class="prospectus-modal-frame" title="BPA Prospectus preview"
-                        src="{{ route('students.prospectus.stream', $student) }}"></iframe>
+                    <iframe class="prospectus-modal-frame" title="Prospectus PDF preview" src="about:blank"
+                        data-url="{{ route('students.prospectus.stream', $student) }}"></iframe>
                 </dialog>
             @endif
 
@@ -336,7 +346,12 @@
 
         @if (auth()->user()->isRegistrar())
             const prospectusModal = document.querySelector('#prospectus-modal');
+            const prospectusFrame = document.querySelector('.prospectus-modal-frame');
+            const prospectusTemplate = document.querySelector('#prospectus-template');
             document.querySelector('#open-prospectus-modal').addEventListener('click', () => {
+                const previewUrl = new URL(prospectusFrame.dataset.url, window.location.href);
+                previewUrl.searchParams.set('template', prospectusTemplate.value);
+                prospectusFrame.src = previewUrl.toString();
                 prospectusModal.showModal();
             });
             document.querySelector('#close-prospectus-modal').addEventListener('click', () => {
