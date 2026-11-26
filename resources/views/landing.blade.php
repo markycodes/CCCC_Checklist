@@ -5,7 +5,10 @@
 
 @section('content')
     <div class="landing-loader" role="status" aria-label="Loading Catbalogan City Community College page">
-        <div class="landing-loader-progress" aria-hidden="true"><span></span></div>
+        <div class="landing-loader-progress landing-loader-progress-wordmark" aria-hidden="true">
+            <span class="landing-loader-wordmark-base">CATBALOGAN CITY COMMUNITY COLLEGE</span>
+            <span class="landing-loader-wordmark-fill">CATBALOGAN CITY COMMUNITY COLLEGE</span>
+        </div>
         <img class="landing-loader-logo" src="{{ asset('assets/img/cccc.png') }}" alt="CCCC seal">
     </div>
     <main>

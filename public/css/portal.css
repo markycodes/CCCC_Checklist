@@ -4230,6 +4230,44 @@ body.landing-home-page .landing-loader.is-exiting {
     animation: landing-load-progress 1.35s cubic-bezier(.22, 1, .36, 1) forwards;
 }
 
+.landing-loader-progress-wordmark {
+    bottom: calc(50% - 112px);
+    width: min(360px, calc(100vw - 40px));
+    height: 16px;
+    overflow: hidden;
+    border-radius: 0;
+    background: transparent;
+}
+
+.landing-loader-progress-wordmark > span {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0;
+    background: none;
+    font-size: clamp(8px, 2.4vw, 10px);
+    font-weight: 750;
+    letter-spacing: .12em;
+    line-height: 1;
+    white-space: nowrap;
+    transform: none;
+    animation: none;
+}
+
+.landing-loader-progress-wordmark > .landing-loader-wordmark-base {
+    color: #77736e;
+}
+
+.landing-loader-progress-wordmark > .landing-loader-wordmark-fill {
+    color: #a94720;
+    clip-path: inset(0 100% 0 0);
+    animation: landing-wordmark-fill 1.35s cubic-bezier(.22, 1, .36, 1) forwards;
+}
+
 .landing-loader.is-exiting .landing-loader-progress {
     opacity: 0;
     transition: opacity .18s ease;
@@ -4244,6 +4282,13 @@ body.landing-home-page .landing-loader.is-exiting {
     45% { transform: scaleX(.58); }
     78% { transform: scaleX(.88); }
     100% { transform: scaleX(1); }
+}
+
+@keyframes landing-wordmark-fill {
+    0% { clip-path: inset(0 100% 0 0); }
+    45% { clip-path: inset(0 42% 0 0); }
+    78% { clip-path: inset(0 12% 0 0); }
+    100% { clip-path: inset(0 0 0 0); }
 }
 
 @keyframes landing-logo-pulse {
@@ -4287,6 +4332,10 @@ body.landing-home-page.landing-header-logo-ready .landing-loader-logo {
     .landing-loader-progress {
         bottom: calc(50% - 84px);
     }
+
+    .landing-loader-progress-wordmark {
+        bottom: calc(50% - 100px);
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -4306,6 +4355,10 @@ body.landing-home-page.landing-header-logo-ready .landing-loader-logo {
 
     .landing-loader-progress span {
         transform: scaleX(1);
+    }
+
+    .landing-loader-progress-wordmark > .landing-loader-wordmark-fill {
+        clip-path: none;
     }
 
     body.landing-home-page.landing-loader-active .portal-topbar-landing::before {
