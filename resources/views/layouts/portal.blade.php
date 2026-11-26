@@ -209,12 +209,21 @@
 
         const landingHeader = document.querySelector('.portal-topbar-landing');
         if (landingHeader) {
+            const processSection = document.querySelector('.scroll-reveal-shell');
             const updateLandingHeaderScrollState = () => {
                 landingHeader.classList.toggle('is-page-scrolled', window.scrollY > 0);
+
+                const processBounds = processSection ? processSection.getBoundingClientRect() : null;
+                const isProcessVisible = processBounds !== null
+                    && processBounds.top <= landingHeader.offsetHeight
+                    && processBounds.bottom > landingHeader.offsetHeight;
+
+                landingHeader.classList.toggle('is-process-visible', isProcessVisible);
             };
 
             updateLandingHeaderScrollState();
             window.addEventListener('scroll', updateLandingHeaderScrollState, { passive: true });
+            window.addEventListener('resize', updateLandingHeaderScrollState);
         }
 
         const programDeck = document.querySelector('.landing-program-deck');
