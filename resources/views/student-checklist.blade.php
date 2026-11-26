@@ -13,10 +13,10 @@
     <link rel="stylesheet" href="{{ asset('css/portal.css') }}">
     <link rel="icon" href="{{ asset('assets/img/cccc.png') }}" type="image/x-icon">
     <script>
-        window.bpaCurriculum = @js($curriculum);
+        window.studentCurriculum = @js($curriculum);
         window.completedCourseGrades = @js($completedCourseGrades);
         window.canEnterGrades = @js(auth()->user()->canEnterGrades());
-        window.bpaTotalUnits = {{ $totalUnits }};
+        window.studentTotalUnits = {{ $totalUnits }};
     </script>
     <script src="{{ asset('js/student-checklist.js') }}" defer></script>
 </head>
@@ -54,6 +54,7 @@
             <div class="student-record-summary">
                 <span class="student-record-label">STUDENT RECORD</span>
                 <strong>{{ $student->student_id }}</strong>
+                <span class="student-program-badge">Enrolled program: {{ $programCode }}</span>
                 <span>Entered {{ $student->entry_year }}@if ($student->expected_graduation_year) <span
                     class="footer-dot">·</span> Expected graduation
                 {{ $student->expected_graduation_year }}@endif</span>
@@ -121,8 +122,8 @@
             </div>
             <aside class="student-curriculum-summary">
                 <span>ACADEMIC PROGRAM</span>
-                <strong>Assigned curriculum</strong>
-                <span>Catbalogan City Community College · curriculum</span>
+                <strong>{{ $programName }}</strong>
+                <span>{{ $programCode }} · assigned prospectus</span>
                 <div><span>Courses</span><strong>{{ $totalCourses }}</strong></div>
                 <div><span>Semesters</span><strong>8</strong></div>
                 <div><span>Total units</span><strong>{{ $totalUnits }}</strong></div>
@@ -181,17 +182,7 @@
                     </p>
                 </div>
                 <div class="curriculum-actions">
-                    @if (auth()->user()->isRegistrar())
-                        <label class="prospectus-template-picker" for="prospectus-template">
-                            <span>Template <small>Testing</small></span>
-                            <select id="prospectus-template" aria-label="Select prospectus template for testing">
-                                @foreach (config('prospectus.templates', []) as $program => $template)
-                                    <option value="{{ $program }}" @selected($student->programHead?->program === $program)>
-                                        {{ $program }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </label>
+                    @if (auth()->user()->canViewAllPrograms())
                         <button class="primary-link" type="button" id="open-prospectus-modal" aria-haspopup="dialog"
                             aria-controls="prospectus-modal">
                             Preview Prospectus <span aria-hidden="true">↗</span>
@@ -211,7 +202,7 @@
                 </div>
             </div>
 
-            @if (auth()->user()->isRegistrar())
+            @if (auth()->user()->canViewAllPrograms())
                 <dialog class="prospectus-modal" id="prospectus-modal" aria-label="Prospectus preview">
                     <header class="prospectus-modal-header">
                         <button class="prospectus-modal-close" type="button" id="close-prospectus-modal"
@@ -278,7 +269,8 @@
                     </label>
                     <nav class="student-switcher-list" aria-label="Other student records">
                         @foreach ($studentList as $switchStudent)
-                            @php($switchProgress = $totalCourses ? (int) round(($switchStudent->completed_courses_count / $totalCourses) * 100) : 0)
+                            @php($switchTotalCourses = $studentCourseTotals[$switchStudent->id] ?? $totalCourses)
+                            @php($switchProgress = $switchTotalCourses ? (int) round(($switchStudent->completed_courses_count / $switchTotalCourses) * 100) : 0)
                             <a class="student-switcher-item {{ $switchStudent->is($student) ? 'is-active' : '' }}"
                                 href="{{ route('students.show', $switchStudent) }}"
                                 data-student-name="{{ $switchStudent->name }}"
@@ -344,13 +336,11 @@
             button.focus();
         });
 
-        @if (auth()->user()->isRegistrar())
+        @if (auth()->user()->canViewAllPrograms())
             const prospectusModal = document.querySelector('#prospectus-modal');
             const prospectusFrame = document.querySelector('.prospectus-modal-frame');
-            const prospectusTemplate = document.querySelector('#prospectus-template');
             document.querySelector('#open-prospectus-modal').addEventListener('click', () => {
                 const previewUrl = new URL(prospectusFrame.dataset.url, window.location.href);
-                previewUrl.searchParams.set('template', prospectusTemplate.value);
                 prospectusFrame.src = previewUrl.toString();
                 prospectusModal.showModal();
             });

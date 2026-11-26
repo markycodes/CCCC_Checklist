@@ -208,6 +208,22 @@
                 </div>
                 <div class="course-scroll-card">
                     <div class="course-scroll-card-inner">
+                        <div class="tablet-status-bar" aria-hidden="true">
+                            <span class="tablet-status-time">9:41</span>
+                            <span class="tablet-status-indicators">
+                                <svg class="tablet-status-icon tablet-status-wifi" viewBox="0 0 18 14" fill="none">
+                                    <path d="M1.5 4.1a11.7 11.7 0 0 1 15 0" />
+                                    <path d="M4.2 7.1a7.5 7.5 0 0 1 9.6 0" />
+                                    <path d="M6.9 10.1a3.3 3.3 0 0 1 4.2 0" />
+                                    <circle cx="9" cy="12.2" r="1" />
+                                </svg>
+                                <svg class="tablet-status-icon tablet-status-battery" viewBox="0 0 22 14">
+                                    <rect x="1" y="2.5" width="17" height="9" rx="2" />
+                                    <rect class="tablet-status-battery-level" x="3" y="4.5" width="12" height="5" rx="1" />
+                                    <path d="M20 5v4" />
+                                </svg>
+                            </span>
+                        </div>
                         <div class="program-stages">
                             <article class="program-stage">
                                 <span class="stage-number">01</span>

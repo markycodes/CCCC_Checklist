@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Student;
 use App\Models\StudentCourseCompletion;
 use App\Models\User;
+use App\Services\ProgramCurriculum;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -82,10 +83,10 @@ class StudentController extends Controller
             ->with('status', 'Student record added.');
     }
 
-    public function show(Student $student): View
+    public function show(Student $student, ProgramCurriculum $programCurriculum): View
     {
         $this->authorize('view', $student);
-        $student->load('completedCourses');
+        $student->load(['programHead', 'completedCourses']);
         $studentQuery = auth()->user()->canViewAllPrograms()
             ? Student::query()
             : auth()->user()->students();
@@ -94,11 +95,21 @@ class StudentController extends Controller
             ->withCount('completedCourses')
             ->orderBy('name')
             ->get();
+        $curriculum = $programCurriculum->forProgram($student->programHead?->program);
+        $studentCourseTotals = $studentList->mapWithKeys(
+            fn (Student $switchStudent): array => [
+                $switchStudent->id => $programCurriculum
+                    ->forProgram($switchStudent->programHead?->program)['total_courses'],
+            ],
+        );
 
         return view('student-checklist', [
             'student' => $student,
             'studentList' => $studentList,
-            'curriculum' => config('bpa_curriculum.years'),
+            'programCode' => $curriculum['program'],
+            'programName' => $curriculum['name'],
+            'curriculum' => $curriculum['years'],
+            'studentCourseTotals' => $studentCourseTotals,
             'completedCourseGrades' => $student->completedCourses->mapWithKeys(
                 fn (StudentCourseCompletion $completion): array => [
                     $completion->course_code => $completion->grade === null
@@ -106,8 +117,8 @@ class StudentController extends Controller
                         : (float) $completion->grade,
                 ],
             )->all(),
-            'totalCourses' => config('bpa_curriculum.total_courses'),
-            'totalUnits' => config('bpa_curriculum.total_units'),
+            'totalCourses' => $curriculum['total_courses'],
+            'totalUnits' => $curriculum['total_units'],
         ]);
     }
 

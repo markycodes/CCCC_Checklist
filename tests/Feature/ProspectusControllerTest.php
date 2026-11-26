@@ -39,12 +39,7 @@ class ProspectusControllerTest extends TestCase
             ->get(route('students.show', $student))
             ->assertOk()
             ->assertSee('Preview Prospectus')
-            ->assertSee('id="prospectus-template"', false)
-            ->assertSee('<option value="BPA"', false)
-            ->assertSee('<option value="BSOA"', false)
-            ->assertSee('<option value="BSCRIM"', false)
-            ->assertSee('<option value="BSENTREP"', false)
-            ->assertSee('<option value="BSISM"', false)
+            ->assertDontSee('prospectus-template-picker')
             ->assertSee('id="prospectus-modal"', false)
             ->assertDontSee('prospectus-modal-download', false)
             ->assertDontSee('print-prospectus-modal', false)
@@ -133,7 +128,7 @@ class ProspectusControllerTest extends TestCase
 
     public function test_bsentrep_template_renders_reference_rows_and_track_totals(): void
     {
-        $programHead = User::factory()->programHead()->create(['program' => 'BPA']);
+        $programHead = User::factory()->programHead()->create(['program' => 'BSENTREP']);
         $registrar = User::factory()->registrar()->create();
         $student = $programHead->students()->create([
             'student_id' => 'CCCC-BSENTREP-001',
@@ -142,7 +137,7 @@ class ProspectusControllerTest extends TestCase
         ]);
 
         $this->actingAs($registrar)
-            ->get(route('students.prospectus.show', [$student, 'modal' => 1, 'template' => 'BSENTREP']))
+            ->get(route('students.prospectus.show', [$student, 'modal' => 1]))
             ->assertOk()
             ->assertSee('Bachelor of Science in Entrepreneurship (BSENTREP)')
             ->assertSee('Special Track in Tourism and Hospitality Business')
@@ -169,7 +164,7 @@ class ProspectusControllerTest extends TestCase
 
     public function test_bsentrep_prospectus_renders_as_two_pages(): void
     {
-        $programHead = User::factory()->programHead()->create(['program' => 'BPA']);
+        $programHead = User::factory()->programHead()->create(['program' => 'BSENTREP']);
         $registrar = User::factory()->registrar()->create();
         $student = $programHead->students()->create([
             'student_id' => 'CCCC-BSENTREP-PAGES',
@@ -178,7 +173,7 @@ class ProspectusControllerTest extends TestCase
         ]);
 
         $pdf = $this->actingAs($registrar)
-            ->get(route('students.prospectus.stream', [$student, 'template' => 'BSENTREP']))
+            ->get(route('students.prospectus.stream', $student))
             ->assertOk()
             ->assertHeader('content-type', 'application/pdf')
             ->getContent();
@@ -190,7 +185,7 @@ class ProspectusControllerTest extends TestCase
 
     public function test_bsoa_template_renders_reference_rows_and_underlined_grand_total(): void
     {
-        $programHead = User::factory()->programHead()->create(['program' => 'BPA']);
+        $programHead = User::factory()->programHead()->create(['program' => 'BSOA']);
         $registrar = User::factory()->registrar()->create();
         $student = $programHead->students()->create([
             'student_id' => 'CCCC-BSOA-001',
@@ -199,7 +194,7 @@ class ProspectusControllerTest extends TestCase
         ]);
 
         $this->actingAs($registrar)
-            ->get(route('students.prospectus.show', [$student, 'modal' => 1, 'template' => 'BSOA']))
+            ->get(route('students.prospectus.show', [$student, 'modal' => 1]))
             ->assertOk()
             ->assertSee('Bachelor of Science in Office Administration (BSOA)')
             ->assertSee('STUDENT’S COPY')
@@ -221,7 +216,7 @@ class ProspectusControllerTest extends TestCase
 
     public function test_bsoa_prospectus_renders_as_two_pages(): void
     {
-        $programHead = User::factory()->programHead()->create(['program' => 'BPA']);
+        $programHead = User::factory()->programHead()->create(['program' => 'BSOA']);
         $registrar = User::factory()->registrar()->create();
         $student = $programHead->students()->create([
             'student_id' => 'CCCC-BSOA-PAGES',
@@ -230,7 +225,7 @@ class ProspectusControllerTest extends TestCase
         ]);
 
         $pdf = $this->actingAs($registrar)
-            ->get(route('students.prospectus.stream', [$student, 'template' => 'BSOA']))
+            ->get(route('students.prospectus.stream', $student))
             ->assertOk()
             ->assertHeader('content-type', 'application/pdf')
             ->getContent();
@@ -242,7 +237,7 @@ class ProspectusControllerTest extends TestCase
 
     public function test_bsism_template_renders_reference_rows_and_underlined_grand_total(): void
     {
-        $programHead = User::factory()->programHead()->create(['program' => 'BPA']);
+        $programHead = User::factory()->programHead()->create(['program' => 'BSISM']);
         $registrar = User::factory()->registrar()->create();
         $student = $programHead->students()->create([
             'student_id' => 'CCCC-BSISM-001',
@@ -251,7 +246,7 @@ class ProspectusControllerTest extends TestCase
         ]);
 
         $this->actingAs($registrar)
-            ->get(route('students.prospectus.show', [$student, 'modal' => 1, 'template' => 'BSISM']))
+            ->get(route('students.prospectus.show', [$student, 'modal' => 1]))
             ->assertOk()
             ->assertSee('Bachelor of Science in Industrial Security Management (BSISM)')
             ->assertSee('DEAN’S COPY')
@@ -274,7 +269,7 @@ class ProspectusControllerTest extends TestCase
 
     public function test_bsism_prospectus_renders_as_two_pages(): void
     {
-        $programHead = User::factory()->programHead()->create(['program' => 'BPA']);
+        $programHead = User::factory()->programHead()->create(['program' => 'BSISM']);
         $registrar = User::factory()->registrar()->create();
         $student = $programHead->students()->create([
             'student_id' => 'CCCC-BSISM-PAGES',
@@ -283,7 +278,7 @@ class ProspectusControllerTest extends TestCase
         ]);
 
         $pdf = $this->actingAs($registrar)
-            ->get(route('students.prospectus.stream', [$student, 'template' => 'BSISM']))
+            ->get(route('students.prospectus.stream', $student))
             ->assertOk()
             ->assertHeader('content-type', 'application/pdf')
             ->assertHeader('content-disposition', 'inline; filename=BSISM-Prospectus-Deans-Copy.pdf')
@@ -294,50 +289,38 @@ class ProspectusControllerTest extends TestCase
         $this->assertSame(2, count($pages[0]));
     }
 
-    public function test_registrar_can_select_a_different_prospectus_template_for_testing(): void
+    public function test_registrar_and_administrator_see_the_program_heads_assigned_prospectus(): void
     {
-        $programHead = User::factory()->programHead()->create(['program' => 'BPA']);
-        $registrar = User::factory()->registrar()->create();
+        $programHead = User::factory()->programHead()->create(['program' => 'BSCRIM']);
         $student = $programHead->students()->create([
-            'student_id' => 'CCCC-TEMPLATE-TEST',
-            'name' => 'Template Test Student',
+            'student_id' => 'CCCC-SHARED-TEMPLATE',
+            'name' => 'Shared Template Student',
             'entry_year' => 2024,
         ]);
 
-        $this->actingAs($registrar)
-            ->get(route('students.prospectus.show', [$student, 'modal' => 1, 'template' => 'BSCRIM']))
-            ->assertOk()
-            ->assertSee('Bachelor of Science in Criminology (BS Criminology)')
-            ->assertSee('CRM 1101');
+        foreach ([
+            User::factory()->registrar()->create(),
+            User::factory()->administrator()->create(),
+        ] as $staff) {
+            $this->actingAs($staff)
+                ->get(route('students.show', $student))
+                ->assertOk()
+                ->assertSee('Preview Prospectus')
+                ->assertDontSee('prospectus-template-picker');
 
-        $streamedPreview = $this->get(route('students.prospectus.stream', [$student, 'template' => 'BSCRIM']))
-            ->assertOk()
-            ->assertHeader('content-type', 'application/pdf');
-
-        $this->assertStringContainsString(
-            'BSCRIM-Prospectus-Students-Copy.pdf',
-            $streamedPreview->headers->get('content-disposition'),
-        );
+            $this->get(route('students.prospectus.show', [
+                $student,
+                'modal' => 1,
+                'template' => 'BSISM',
+            ]))
+                ->assertOk()
+                ->assertSee('Bachelor of Science in Criminology (BS Criminology)')
+                ->assertSee('CRM 1101')
+                ->assertDontSee('Bachelor of Science in Industrial Security Management (BSISM)');
+        }
     }
 
-    public function test_registrar_cannot_select_an_unregistered_prospectus_template(): void
-    {
-        $programHead = User::factory()->programHead()->create(['program' => 'BPA']);
-        $registrar = User::factory()->registrar()->create();
-        $student = $programHead->students()->create([
-            'student_id' => 'CCCC-TEMPLATE-INVALID',
-            'name' => 'Invalid Template Student',
-            'entry_year' => 2024,
-        ]);
-
-        $this->actingAs($registrar)
-            ->from(route('students.show', $student))
-            ->get(route('students.prospectus.show', [$student, 'template' => 'UNREGISTERED']))
-            ->assertRedirect(route('students.show', $student))
-            ->assertSessionHasErrors('template');
-    }
-
-    public function test_only_registrars_can_access_the_prospectus(): void
+    public function test_administrators_and_registrars_can_preview_prospectus_but_program_heads_cannot(): void
     {
         $administrator = User::factory()->administrator()->create();
         $registrar = User::factory()->registrar()->create();
@@ -351,11 +334,13 @@ class ProspectusControllerTest extends TestCase
         $this->actingAs($administrator)
             ->get(route('students.show', $student))
             ->assertOk()
-            ->assertDontSee('Preview Prospectus');
+            ->assertSee('Preview Prospectus');
 
         $this->actingAs($administrator)
             ->get(route('students.prospectus.show', [$student, 'modal' => 1]))
-            ->assertForbidden();
+            ->assertOk()
+            ->assertSee('GRADING SYSTEM')
+            ->assertSee('Staff Prospectus Student');
 
         $this->actingAs($programHead)
             ->get(route('students.show', $student))

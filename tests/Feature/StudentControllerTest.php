@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class StudentControllerTest extends TestCase
@@ -95,6 +96,52 @@ class StudentControllerTest extends TestCase
                 ->assertOk()
                 ->assertSee('BSCRIM Student');
         }
+    }
+
+    #[DataProvider('programCurriculumOrder')]
+    public function test_student_checklist_uses_assigned_program_prospectus_order(
+        string $program,
+        string $firstSemesterCourse,
+        string $secondSemesterCourse,
+        string $lastCourse,
+    ): void {
+        $programHead = User::factory()->programHead()->create(['program' => $program]);
+        $student = $programHead->students()->create([
+            'student_id' => "CCCC-{$program}-CURRICULUM",
+            'name' => "{$program} Curriculum Student",
+            'entry_year' => 2024,
+        ]);
+
+        $this->actingAs($programHead)
+            ->get(route('students.show', $student))
+            ->assertOk()
+            ->assertSee("Enrolled program: {$program}")
+            ->assertViewHas('programCode', $program)
+            ->assertViewHas('curriculum', function (array $curriculum) use (
+                $firstSemesterCourse,
+                $secondSemesterCourse,
+                $lastCourse,
+            ): bool {
+                return count($curriculum) === 4
+                    && $curriculum[0]['name'] === 'First year'
+                    && $curriculum[0]['semesters'][0]['name'] === 'First semester'
+                    && $curriculum[0]['semesters'][0]['courses'][0]['code'] === $firstSemesterCourse
+                    && $curriculum[0]['semesters'][1]['courses'][0]['code'] === $secondSemesterCourse
+                    && $curriculum[3]['semesters'][1]['courses'][
+                        array_key_last($curriculum[3]['semesters'][1]['courses'])
+                    ]['code'] === $lastCourse;
+            });
+    }
+
+    public static function programCurriculumOrder(): array
+    {
+        return [
+            'BPA' => ['BPA', 'GED 1003', 'GED 1001', 'PPA 4201'],
+            'BSCRIM' => ['BSCRIM', 'GED 1001', 'GED 1003', 'CBA 4203'],
+            'BSISM' => ['BSISM', 'GED 1003', 'GED 1001', 'ISP 4202'],
+            'BSENTREP' => ['BSENTREP', 'GED 1003', 'GED 1001', 'ENT 4215'],
+            'BSOA' => ['BSOA', 'GED 1003', 'GED 1001', 'PEC 4206'],
+        ];
     }
 
     public function test_duplicate_student_id_is_rejected_for_the_same_program_head(): void

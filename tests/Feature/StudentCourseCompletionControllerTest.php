@@ -63,6 +63,32 @@ class StudentCourseCompletionControllerTest extends TestCase
         ]);
     }
 
+    public function test_program_head_can_save_a_course_from_their_assigned_program_prospectus(): void
+    {
+        $programHead = User::factory()->programHead()->create(['program' => 'BSCRIM']);
+        $student = $programHead->students()->create([
+            'student_id' => 'CCCC-BSCRIM-GRADE',
+            'name' => 'Criminology Grade Student',
+            'entry_year' => 2024,
+        ]);
+
+        $this->actingAs($programHead)
+            ->putJson(route('students.courses.complete', [$student, 'CRM 1101']), [
+                'grade' => 2.00,
+            ])
+            ->assertOk()
+            ->assertExactJson([
+                'completed' => true,
+                'grade' => '2.00',
+            ]);
+
+        $this->assertDatabaseHas('student_course_completions', [
+            'student_id' => $student->id,
+            'course_code' => 'CRM 1101',
+            'grade' => 2.00,
+        ]);
+    }
+
     public function test_program_head_cannot_save_progress_for_another_heads_student(): void
     {
         $programHead = User::factory()->programHead()->create();
@@ -82,7 +108,7 @@ class StudentCourseCompletionControllerTest extends TestCase
 
     public function test_course_outside_the_approved_curriculum_is_rejected(): void
     {
-        $programHead = User::factory()->programHead()->create();
+        $programHead = User::factory()->programHead()->create(['program' => 'BSCRIM']);
         $student = $programHead->students()->create([
             'student_id' => 'CCCC-INVALID-001',
             'name' => 'Checklist Student',
@@ -90,7 +116,7 @@ class StudentCourseCompletionControllerTest extends TestCase
         ]);
 
         $this->actingAs($programHead)
-            ->put(route('students.courses.complete', [$student, 'UNKNOWN 9999']))
+            ->put(route('students.courses.complete', [$student, 'PAC 1101']))
             ->assertNotFound();
 
         $this->assertDatabaseCount('student_course_completions', 0);
@@ -173,16 +199,16 @@ class StudentCourseCompletionControllerTest extends TestCase
 
     public function test_program_head_can_remove_saved_course_completion(): void
     {
-        $programHead = User::factory()->programHead()->create();
+        $programHead = User::factory()->programHead()->create(['program' => 'BSCRIM']);
         $student = $programHead->students()->create([
             'student_id' => 'CCCC-UNDO-001',
             'name' => 'Checklist Student',
             'entry_year' => 2024,
         ]);
-        $student->completedCourses()->create(['course_code' => 'GED 1003']);
+        $student->completedCourses()->create(['course_code' => 'CRM 1101']);
 
         $this->actingAs($programHead)
-            ->delete(route('students.courses.incomplete', [$student, 'GED 1003']))
+            ->delete(route('students.courses.incomplete', [$student, 'CRM 1101']))
             ->assertOk()
             ->assertExactJson(['completed' => false]);
 

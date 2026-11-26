@@ -1,6 +1,6 @@
 (() => {
-    const curriculum = window.bpaCurriculum;
-    const totalUnits = window.bpaTotalUnits;
+    const curriculum = window.studentCurriculum;
+    const totalUnits = window.studentTotalUnits;
     const courseBase = document.body.dataset.courseBase;
     const courses = curriculum.flatMap((year, yearIndex) => year.semesters.flatMap((semester, semesterIndex) =>
         semester.courses.map((course) => ({ ...course, yearIndex, semesterIndex })),
@@ -157,7 +157,9 @@
         const semesterCourses = semester.courses;
         const doneCount = semesterCourses.filter((course) => completed.has(course.code)).length;
         const semesterUnits = semesterCourses.reduce((sum, course) => sum + course.units, 0);
-        document.querySelector('#semester-kicker').textContent = `YEAR ${['ONE', 'TWO', 'THREE', 'FOUR'][activeYear]} · ${curriculum[activeYear].focus.toUpperCase()}`;
+        const yearNumber = ['ONE', 'TWO', 'THREE', 'FOUR'][activeYear];
+        const yearFocus = curriculum[activeYear].focus;
+        document.querySelector('#semester-kicker').textContent = `YEAR ${yearNumber}${yearFocus ? ` · ${yearFocus.toUpperCase()}` : ''}`;
         document.querySelector('#semester-title').textContent = semester.name;
         document.querySelector('#semester-subtitle').textContent = `${semesterCourses.length} courses · ${semesterUnits} units`;
         document.querySelector('#semester-progress-text').textContent = `${doneCount} / ${semesterCourses.length}`;

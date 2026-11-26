@@ -3,16 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\Student;
+use App\Services\ProgramCurriculum;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class StudentCourseCompletionController extends Controller
 {
+    public function __construct(private readonly ProgramCurriculum $programCurriculum) {}
+
     public function store(Request $request, Student $student, string $course): JsonResponse
     {
         $this->authorize('view', $student);
         abort_unless(auth()->user()?->canEnterGrades(), 403);
-        abort_unless($this->isCurriculumCourse($course), 404);
+        abort_unless($this->programCurriculum->containsCourse($student->programHead?->program, $course), 404);
 
         $validated = $request->validate([
             'grade' => ['required', 'numeric', 'between:0,5'],
@@ -45,20 +48,12 @@ class StudentCourseCompletionController extends Controller
     {
         $this->authorize('view', $student);
         abort_unless(auth()->user()?->canEnterGrades(), 403);
-        abort_unless($this->isCurriculumCourse($course), 404);
+        abort_unless($this->programCurriculum->containsCourse($student->programHead?->program, $course), 404);
 
         $student->completedCourses()
             ->where('course_code', $course)
             ->delete();
 
         return response()->json(['completed' => false]);
-    }
-
-    private function isCurriculumCourse(string $courseCode): bool
-    {
-        return collect(config('bpa_curriculum.years'))
-            ->flatMap(fn (array $year) => $year['semesters'])
-            ->flatMap(fn (array $semester) => $semester['courses'])
-            ->contains(fn (array $course) => $course['code'] === $courseCode);
     }
 }
