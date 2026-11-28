@@ -5,12 +5,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#a94720">
+    <meta name="theme-color" content="#faf9f5">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="description"
         content="Program Head course checklist for {{ $student->name }} at Catbalogan City Community College.">
     <title>{{ $student->name }} · Student Course Checklist</title>
+    <script src="{{ asset('js/theme-toggle.js') }}"></script>
     <link rel="stylesheet" href="{{ asset('css/student-checklist.css') }}">
     <link rel="stylesheet" href="{{ asset('css/portal.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/claude-amber.css') }}">
     <link rel="icon" href="{{ asset('assets/img/cccc.png') }}" type="image/x-icon">
     <script>
         window.studentCurriculum = @js($curriculum);
@@ -24,7 +27,7 @@
 <body data-student-id="{{ $student->id }}" data-course-base="{{ route('students.show', $student) }}/courses">
     <header class="topbar">
         <a class="brand" href="{{ route('students.index') }}" aria-label="Student records">
-            <img class="college-logo" src="{{ asset('assets/img/CCCClogo.webp') }}" width="45" height="47" alt="">
+            <img class="college-logo" src="{{ asset('assets/img/cccc.png') }}" width="45" height="47" alt="">
             <span class="brand-copy">
                 <strong>CCCC</strong>
                 <span>CATBALOGAN CITY COMMUNITY COLLEGE</span>
@@ -34,6 +37,15 @@
             <span></span><span></span><span></span>
         </button>
         <div id="checklist-mobile-menu" class="topbar-right">
+            <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark mode" aria-pressed="false" title="Switch to dark mode">
+                <svg class="theme-toggle-icon theme-toggle-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                    <circle cx="12" cy="12" r="4"></circle>
+                    <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+                </svg>
+                <svg class="theme-toggle-icon theme-toggle-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                    <path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z"></path>
+                </svg>
+            </button>
             <a class="topbar-link is-active" href="{{ route('students.index') }}" aria-current="page"><span aria-hidden="true">←</span> All students</a>
             <span class="account-name">{{ auth()->user()->isRegistrar() ? 'Registrar' : (auth()->user()->isAdministrator() ? 'Administrator' : 'Program Head') }} · {{ auth()->user()->name }}</span>
             <form class="logout-form" method="POST" action="{{ route('logout') }}">
@@ -339,10 +351,19 @@
         @if (auth()->user()->canViewAllPrograms())
             const prospectusModal = document.querySelector('#prospectus-modal');
             const prospectusFrame = document.querySelector('.prospectus-modal-frame');
-            document.querySelector('#open-prospectus-modal').addEventListener('click', () => {
+            const loadProspectusPreview = () => {
                 const previewUrl = new URL(prospectusFrame.dataset.url, window.location.href);
+                previewUrl.searchParams.set('preview_refresh', Date.now().toString());
                 prospectusFrame.src = previewUrl.toString();
+            };
+            document.querySelector('#open-prospectus-modal').addEventListener('click', () => {
+                loadProspectusPreview();
                 prospectusModal.showModal();
+            });
+            document.addEventListener('student-course-grade-updated', () => {
+                if (prospectusModal.open) {
+                    loadProspectusPreview();
+                }
             });
             document.querySelector('#close-prospectus-modal').addEventListener('click', () => {
                 prospectusModal.close();

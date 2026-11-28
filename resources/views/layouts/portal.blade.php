@@ -6,8 +6,10 @@
     <meta name="theme-color" content="#a94720">
     <meta name="description" content="@yield('description', 'Catbalogan City Community College student course checklist.')">
     <title>@yield('title') · CCCC Student Checklist</title>
+    <script src="{{ asset('js/theme-toggle.js') }}"></script>
     <link rel="stylesheet" href="{{ asset('css/student-checklist.css') }}">
     <link rel="stylesheet" href="{{ asset('css/portal.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/claude-amber.css') }}">
     <link rel="icon" href="{{ asset('assets/img/cccc.png') }}" type="image/x-icon">
 </head>
 @php
@@ -18,6 +20,7 @@
     'landing-loader-active' => request()->routeIs('home', 'login'),
     'landing-home-page' => request()->routeIs('home'),
     'internal-portal' => ! $usesPublicHeader,
+    'registrar-portal' => ! $usesPublicHeader && auth()->check() && auth()->user()->isRegistrar(),
 ])>
     <header @class(['portal-topbar', 'portal-topbar-landing' => $usesPublicHeader])>
         @if ($usesPublicHeader)
@@ -25,7 +28,7 @@
             <span class="portal-topbar-curve portal-topbar-curve-right" aria-hidden="true"></span>
         @endif
         <a class="portal-brand" href="{{ route('home') }}" aria-label="Catbalogan City Community College home">
-            <img class="college-logo" src="{{ asset('assets/img/CCCClogo.webp') }}" width="45" height="47" alt="">
+            <img class="college-logo" src="{{ asset('assets/img/cccc.png') }}" width="45" height="47" alt="">
             <span class="portal-brand-copy">
                 <strong>CATBALOGAN CITY</strong>
                 <span>COMMUNITY COLLEGE <i>·</i> STUDENT CHECKLIST</span>
@@ -35,6 +38,15 @@
             <span></span><span></span><span></span>
         </button>
         <nav id="portal-mobile-menu" class="portal-nav" aria-label="Main navigation">
+            <button class="theme-toggle portal-menu-theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark mode" aria-pressed="false" title="Switch to dark mode">
+                <svg class="theme-toggle-icon theme-toggle-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                    <circle cx="12" cy="12" r="4"></circle>
+                    <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+                </svg>
+                <svg class="theme-toggle-icon theme-toggle-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                    <path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z"></path>
+                </svg>
+            </button>
             @auth
                 @if (auth()->user()->isAdministrator())
                     <a class="portal-nav-link {{ request()->routeIs('admin.dashboard') ? 'is-active' : '' }}" href="{{ route('admin.dashboard') }}" @if(request()->routeIs('admin.dashboard')) aria-current="page" @endif>Administration</a>
@@ -42,6 +54,13 @@
                 @elseif (auth()->user()->isRegistrar())
                     <a class="portal-nav-link {{ request()->routeIs('registrar.dashboard') ? 'is-active' : '' }}" href="{{ route('registrar.dashboard') }}" @if(request()->routeIs('registrar.dashboard')) aria-current="page" @endif>Registrar overview</a>
                     <a class="portal-nav-link {{ request()->routeIs('students.*') ? 'is-active' : '' }}" href="{{ route('students.index') }}" @if(request()->routeIs('students.*')) aria-current="page" @endif>Student records</a>
+                    <span class="portal-nav-section-label">Registrar tools</span>
+                    <a class="portal-nav-link {{ request()->routeIs('registrar.enrollment') ? 'is-active' : '' }}" href="{{ route('registrar.enrollment') }}" @if(request()->routeIs('registrar.enrollment')) aria-current="page" @endif>Enrollment</a>
+                    <a class="portal-nav-link {{ request()->routeIs('registrar.grades') ? 'is-active' : '' }}" href="{{ route('registrar.grades') }}" @if(request()->routeIs('registrar.grades')) aria-current="page" @endif>Grade management</a>
+                    <a class="portal-nav-link {{ request()->routeIs('registrar.transcript-requests') ? 'is-active' : '' }}" href="{{ route('registrar.transcript-requests') }}" @if(request()->routeIs('registrar.transcript-requests')) aria-current="page" @endif>Transcript requests</a>
+                    <a class="portal-nav-link {{ request()->routeIs('registrar.academic-calendar') ? 'is-active' : '' }}" href="{{ route('registrar.academic-calendar') }}" @if(request()->routeIs('registrar.academic-calendar')) aria-current="page" @endif>Academic calendar</a>
+                    <a class="portal-nav-link {{ request()->routeIs('registrar.reports') ? 'is-active' : '' }}" href="{{ route('registrar.reports') }}" @if(request()->routeIs('registrar.reports')) aria-current="page" @endif>Reports</a>
+                    <a class="portal-nav-link {{ request()->routeIs('registrar.settings') ? 'is-active' : '' }}" href="{{ route('registrar.settings') }}" @if(request()->routeIs('registrar.settings')) aria-current="page" @endif>Settings</a>
                 @else
                     <a class="portal-nav-link {{ request()->routeIs('students.*') ? 'is-active' : '' }}" href="{{ route('students.index') }}" @if(request()->routeIs('students.*')) aria-current="page" @endif>Student records</a>
                 @endif
@@ -57,6 +76,17 @@
                 <a class="portal-nav-link" href="{{ route('home') }}">← Back to home</a>
             @endif
         </nav>
+        @if ($usesPublicHeader)
+            <button class="theme-toggle portal-header-theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark mode" aria-pressed="false" title="Switch to dark mode">
+                <svg class="theme-toggle-icon theme-toggle-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                    <circle cx="12" cy="12" r="4"></circle>
+                    <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 1.42 1.42 1.42M2 12h2m16 0h2M4.93 19.07l-1.42-1.42m11.3-11.3 1.42-1.42"></path>
+                </svg>
+                <svg class="theme-toggle-icon theme-toggle-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                    <path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z"></path>
+                </svg>
+            </button>
+        @endif
     </header>
 
     @auth

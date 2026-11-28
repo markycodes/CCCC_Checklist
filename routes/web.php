@@ -34,6 +34,30 @@ Route::middleware(['auth', 'administrator'])->prefix('admin')->name('admin.')->g
 
 Route::middleware(['auth', 'registrar'])->prefix('registrar')->name('registrar.')->group(function () {
     Route::get('/', [RegistrarDashboardController::class, 'index'])->name('dashboard');
+    Route::view('/enrollment', 'registrar.coming-soon', [
+        'feature' => 'Enrollment management',
+        'description' => 'Enrollment intake and registration review tools are being prepared.',
+    ])->name('enrollment');
+    Route::view('/grades', 'registrar.coming-soon', [
+        'feature' => 'Grade management',
+        'description' => 'A centralized workspace for reviewing and managing student grades is being prepared.',
+    ])->name('grades');
+    Route::view('/transcript-requests', 'registrar.coming-soon', [
+        'feature' => 'Transcript requests',
+        'description' => 'Transcript request tracking and processing tools are being prepared.',
+    ])->name('transcript-requests');
+    Route::view('/academic-calendar', 'registrar.coming-soon', [
+        'feature' => 'Academic calendar',
+        'description' => 'Important academic dates and registrar deadlines will be available here.',
+    ])->name('academic-calendar');
+    Route::view('/reports', 'registrar.coming-soon', [
+        'feature' => 'Registrar reports',
+        'description' => 'Detailed enrollment and records reports are being prepared.',
+    ])->name('reports');
+    Route::view('/settings', 'registrar.coming-soon', [
+        'feature' => 'Registrar settings',
+        'description' => 'Registrar workspace preferences and configuration tools are being prepared.',
+    ])->name('settings');
 });
 
 Route::middleware(['auth', 'program-head'])->group(function () {

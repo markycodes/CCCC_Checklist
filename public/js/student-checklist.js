@@ -242,6 +242,7 @@
 
             setSaveStatus('saved');
             const result = await response.json();
+            document.dispatchEvent(new Event('student-course-grade-updated'));
             document.querySelector('#announcement').textContent = `${course.code} grade ${Number(result.grade).toFixed(2)} saved. ${result.completed ? 'Course completed.' : 'Course not passed.'}`;
         } catch (error) {
             courseGrades.delete(course.code);
@@ -273,6 +274,7 @@
             });
             if (!response.ok) throw new Error(`The server returned ${response.status}.`);
             setSaveStatus('saved');
+            document.dispatchEvent(new Event('student-course-grade-updated'));
             document.querySelector('#announcement').textContent = `${course.code} grade cleared.`;
         } catch (error) {
             setSaveStatus('error');

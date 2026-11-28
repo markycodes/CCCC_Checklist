@@ -73,6 +73,33 @@ class ProspectusControllerTest extends TestCase
         $preview->assertSee('class="line" style="width:100%"', false);
     }
 
+    public function test_prospectus_preview_reflects_a_grade_saved_after_the_student_page_loaded(): void
+    {
+        $programHead = User::factory()->programHead()->create();
+        $registrar = User::factory()->registrar()->create();
+        $student = $programHead->students()->create([
+            'student_id' => 'CCCC-PROSPECTUS-LIVE-GRADE',
+            'name' => 'Live Grade Student',
+            'entry_year' => 2024,
+        ]);
+
+        $this->actingAs($registrar)
+            ->get(route('students.show', $student))
+            ->assertOk();
+
+        $this->putJson(route('students.courses.complete', [$student, 'GED 1003']), [
+            'grade' => 1.75,
+        ])->assertOk()
+            ->assertExactJson([
+                'completed' => true,
+                'grade' => '1.75',
+            ]);
+
+        $this->get(route('students.prospectus.show', [$student, 'modal' => 1]))
+            ->assertOk()
+            ->assertSee('<span class="chk chk-grade">1.75</span>', false);
+    }
+
     public function test_bscrim_student_renders_the_bscrim_prospectus_template(): void
     {
         $programHead = User::factory()->programHead()->create(['program' => 'BSCRIM']);
